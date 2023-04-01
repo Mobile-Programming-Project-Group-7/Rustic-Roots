@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Rustic Roots</string>
+    <string name="google_pay_NA">Unfortunately, Google Pay is not available on this device</string>
+    <string name="payments_show_name">Successfully received payment data for %s!</string>
 </resources>
