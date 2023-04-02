@@ -7,8 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.rusticroots.model.PaymentGateway
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.pay.Pay
-import com.google.android.gms.pay.PayClient
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wallet.IsReadyToPayRequest
 import com.google.android.gms.wallet.PaymentData
@@ -28,7 +26,6 @@ class PaymentGViewModel(application: Application): AndroidViewModel(application)
     }
 
     val canUseGooglePay: LiveData<Boolean> = _canUseGooglePay
-
 
     private fun fetchCanUseGooglePay() {
         val isReadyToPayJson = PaymentGateway.isReadyToPayRequest()
