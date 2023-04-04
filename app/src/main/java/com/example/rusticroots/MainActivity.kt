@@ -1,4 +1,4 @@
-    package com.example.rusticroots
+package com.example.rusticroots
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
