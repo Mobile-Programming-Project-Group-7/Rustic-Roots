@@ -17,8 +17,7 @@
             android:exported="true"
             android:label="@Rustic Roots"
             android:theme="@style/Theme.MyApp">
-            android:name=".SplashActivity"
-            android:exported="true" >
+            
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
