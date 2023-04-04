@@ -46,7 +46,6 @@ fun DefaultPreview() {
     RusticRootsTheme {
         Greeting("Rustic Roots")
 
-        setContentView(R.layout.activity_main)
 
 
     }
