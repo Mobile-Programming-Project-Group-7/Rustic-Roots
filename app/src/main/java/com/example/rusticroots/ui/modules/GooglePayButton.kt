@@ -1,6 +1,7 @@
 package com.example.rusticroots.ui.modules
 
 import android.app.Activity
+import android.app.PendingIntent
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -43,37 +44,13 @@ fun GooglePayButton(paymentGVM: PaymentGViewModel) {
         }
     }
 
+    val temp: (PendingIntent) -> Unit = { r -> resolvePaymentForResult.launch(
+        IntentSenderRequest.Builder(r).build()
+    )}
+
     Button(
         onClick = {
-            val dummyPriceCents = 100L
-            val shippingCostCents = 900L
-            val task = paymentGVM.getLoadPaymentDataTask(dummyPriceCents + shippingCostCents)
-
-            task.addOnCompleteListener { completedTask ->
-                if (completedTask.isSuccessful) {
-                    completedTask.result.let(::handlePaymentSuccess)
-                    Log.d("*************************", "completedTask.isSuccessful")
-                } else {
-                    Log.e("*************************", "completedTask.isNOTSuccessful")
-                    when (val exception = completedTask.exception) {
-                        is ResolvableApiException -> {
-                            Log.d("*************************", "ResolvableApiException")
-                            resolvePaymentForResult.launch(
-                                IntentSenderRequest.Builder(exception.resolution).build()
-                            )
-                        }
-                        is ApiException -> {
-                            handleError(exception.statusCode, exception.message)
-                        }
-                        else -> {
-                            handleError(
-                                CommonStatusCodes.INTERNAL_ERROR, "Unexpected non API" +
-                                        " exception when trying to deliver the task result to an activity!"
-                            )
-                        }
-                    }
-                }
-            }
+            Test(paymentGVM, temp)
         },
         modifier = Modifier
             .padding(8.dp)
@@ -85,6 +62,36 @@ fun GooglePayButton(paymentGVM: PaymentGViewModel) {
             id = R.drawable.pay_with_googlepay_button_content),
             contentDescription = "Google pay Button"
         )
+    }
+}
+
+fun Test(paymentGVM: PaymentGViewModel, mytest: (PendingIntent) -> Unit){
+    val dummyPriceCents = 100L
+    val shippingCostCents = 900L
+    val task = paymentGVM.getLoadPaymentDataTask(dummyPriceCents + shippingCostCents)
+
+    task.addOnCompleteListener { completedTask ->
+        if (completedTask.isSuccessful) {
+            completedTask.result.let(::handlePaymentSuccess)
+            Log.d("*************************", "completedTask.isSuccessful")
+        } else {
+            Log.e("*************************", "completedTask.isNOTSuccessful")
+            when (val exception = completedTask.exception) {
+                is ResolvableApiException -> {
+                    Log.d("*************************", "ResolvableApiException")
+                    mytest(exception.resolution)
+                }
+                is ApiException -> {
+                    handleError(exception.statusCode, exception.message)
+                }
+                else -> {
+                    handleError(
+                        CommonStatusCodes.INTERNAL_ERROR, "Unexpected non API" +
+                                " exception when trying to deliver the task result to an activity!"
+                    )
+                }
+            }
+        }
     }
 }
 
