@@ -20,11 +20,10 @@ import com.example.rusticroots.model.data.MenuItem
 
 @Composable
 fun  DrawerHeader() {
-    Box(modifier=Modifier
-        .fillMaxWidth()
-        .padding(vertical=64.dp),
-        contentAlignment = Alignment.TopStart){
-        Text(text="Rustic Roots", fontSize = 50.sp )
+    Box(modifier= Modifier.fillMaxWidth()){
+        Image(
+            painterResource(id= R.drawable.rustic_roots),"Rustic Roots",
+            modifier = Modifier.size(200.dp).align(Alignment.TopStart))
 
 
 
