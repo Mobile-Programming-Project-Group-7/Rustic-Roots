@@ -9,16 +9,23 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rusticroots.model.data.MenuItem
+import com.example.rusticroots.model.data.Reservations
+import com.example.rusticroots.model.data.Tables
 import com.example.rusticroots.ui.modules.GooglePayButton
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.PaymentGViewModel
+import com.example.rusticroots.viewmodel.ReservationsViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
@@ -32,7 +39,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             RusticRootsTheme {
-                val scaffoldState=rememberScaffoldState()
+                MyApp()
+                /*val scaffoldState=rememberScaffoldState()
                 val scope=rememberCoroutineScope()
                 Scaffold(
                     scaffoldState=scaffoldState,
@@ -97,9 +105,11 @@ class MainActivity : ComponentActivity() {
 
 
                 }
+
+                 */
                 /*      val paymentGVM: PaymentGViewModel by viewModels() // = PaymentGViewModel(this.application)*/
 
-
+/*
                 val db=Firebase.firestore;
                 val user=hashMapOf(
                     "first" to "Adaddd",
@@ -114,6 +124,8 @@ class MainActivity : ComponentActivity() {
                     .addOnFailureListener { e ->
                         Log.i("Error adding document", e.toString())
                     }
+
+ */
 // These four closing  bracket are kept because of commenting below payment codes.
             }}}}
 
@@ -152,11 +164,25 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-@Composable
-fun MyApp(paymentGVM: PaymentGViewModel) {
-    Column() {
-        GooglePayButton(paymentGVM = paymentGVM)
-    }
-}
 */
+@Composable
+fun MyApp() {
+    val vm: ReservationsViewModel = viewModel()
+
+    //vm.createTable()
+
+    /*TESTER CODE
+    Column() {
+        Button(onClick = { vm.getAllTables() }) {
+            Text(text = "Get Table descriptions")
+        }
+        LazyColumn(){
+            items(items= vm.allTables){
+                Divider(thickness = 5.dp)
+                Text(text = it.description)
+            }
+        }
+    }*/
+
+
+}
