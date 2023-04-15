@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rusticroots.model.data.MenuItem
 import com.example.rusticroots.model.data.Reservations
 import com.example.rusticroots.model.data.Tables
+import com.example.rusticroots.model.data.tableID
 import com.example.rusticroots.ui.modules.GooglePayButton
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.PaymentGViewModel
@@ -169,7 +170,7 @@ class MainActivity : ComponentActivity() {
 fun MyApp() {
     val vm: ReservationsViewModel = viewModel()
 
-    //vm.createTable()
+    //vm.createTable(1)
 
     /*TESTER CODE
     Column() {
