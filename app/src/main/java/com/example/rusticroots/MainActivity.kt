@@ -20,9 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rusticroots.model.data.MenuItem
-import com.example.rusticroots.model.data.Reservations
-import com.example.rusticroots.model.data.Tables
-import com.example.rusticroots.model.data.tableID
 import com.example.rusticroots.ui.modules.GooglePayButton
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.PaymentGViewModel
@@ -30,6 +27,7 @@ import com.example.rusticroots.viewmodel.ReservationsViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
+import java.util.*
 
 class MainActivity : ComponentActivity() {
 
@@ -171,8 +169,9 @@ fun MyApp() {
     val vm: ReservationsViewModel = viewModel()
 
     //vm.createTable(1)
+    //vm.createBooking("table_1", Date(), Date())
 
-    /*TESTER CODE
+    /*TESTER CODE*/
     Column() {
         Button(onClick = { vm.getAllTables() }) {
             Text(text = "Get Table descriptions")
@@ -180,10 +179,10 @@ fun MyApp() {
         LazyColumn(){
             items(items= vm.allTables){
                 Divider(thickness = 5.dp)
-                Text(text = it.description)
+                Text(text = it.toString() + it.available.toString())
             }
         }
-    }*/
+    }//*/
 
 
 }

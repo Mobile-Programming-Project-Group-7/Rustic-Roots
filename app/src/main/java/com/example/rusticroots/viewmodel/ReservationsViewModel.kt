@@ -1,16 +1,15 @@
 package com.example.rusticroots.viewmodel
 
-import android.accounts.AuthenticatorDescription
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.rusticroots.model.data.Reservations
-import com.example.rusticroots.model.data.Tables
-import com.example.rusticroots.model.data.tableID
+import com.example.rusticroots.model.data.*
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
+import java.util.*
 
 class ReservationsViewModel: ViewModel() {
 
@@ -42,7 +41,7 @@ class ReservationsViewModel: ViewModel() {
      */
     fun getAllTables(){
         viewModelScope.launch {
-            Firebase.firestore.collection("Tables")
+            Firebase.firestore.collection("tables")
                 .get()
                 .addOnSuccessListener {
                     val tables = mutableStateListOf<Tables>()
@@ -54,6 +53,27 @@ class ReservationsViewModel: ViewModel() {
                     allTables.clear()
                     allTables.addAll(tables)
                 }
+        }
+    }
+
+    /**
+     * Creates a booking
+     */
+    fun createBooking(tableID: String?, timeStart: Date, timeEnd:Date){
+        val uid = "UID"//Firebase.auth.uid
+        viewModelScope.launch {
+            tableID?.let{ uid?.let {
+                val booking = Booking(tableID, uid, timeStart, timeEnd)
+
+                Firebase.firestore.collection("bookings")
+                    .add(booking)
+                    .addOnSuccessListener {
+                        Log.d("******", "Booking created!")
+                    }
+                    .addOnFailureListener {
+                        Log.e("******", it.message.toString())
+                    }
+            }}
         }
     }
 }
