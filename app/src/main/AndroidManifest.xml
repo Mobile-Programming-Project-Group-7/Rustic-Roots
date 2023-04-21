@@ -12,14 +12,13 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/rustic_roots"
-        android:label="Rustic Roots"
+        android:label=""
         android:supportsRtl="true"
         android:theme="@style/Theme.RusticRoots"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="Rustic Roots"
             android:theme="@style/Theme.MyApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

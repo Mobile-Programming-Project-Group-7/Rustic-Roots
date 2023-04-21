@@ -2,26 +2,11 @@ package com.example.rusticroots
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.Observer
-import com.example.rusticroots.model.data.MenuItem
-import com.example.rusticroots.ui.modules.GooglePayButton
+import com.example.rusticroots.pages.HomeScreen
 import com.example.rusticroots.ui.theme.RusticRootsTheme
-import com.example.rusticroots.viewmodel.PaymentGViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -32,19 +17,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             RusticRootsTheme {
-                val scaffoldState=rememberScaffoldState()
+                HomeScreen()
+            } }}}
+/*
+               val scaffoldState=rememberScaffoldState()
                 val scope=rememberCoroutineScope()
                 Scaffold(
                     scaffoldState=scaffoldState,
                     topBar={
-                        AppBar(
-                            onNavigationIconClick={
-                                scope.launch {
-                                    scaffoldState.drawerState.open()
-                                }
-
+                        NavBar {
+                            scope.launch {
+                                scaffoldState.drawerState.open()
                             }
-                        )
+
+                        }
                     },
                     drawerContent={
                         DrawerHeader()
@@ -92,12 +78,12 @@ class MainActivity : ComponentActivity() {
                                 println("Clicked on ${it.title}")
                             }
                         )
-                    }
-                ) {
-
+                    }){
 
                 }
-                /*      val paymentGVM: PaymentGViewModel by viewModels() // = PaymentGViewModel(this.application)*/
+
+
+                      val paymentGVM: PaymentGViewModel by viewModels() // = PaymentGViewModel(this.application)
 
 
                 val db=Firebase.firestore;
@@ -121,7 +107,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
 
 
-/*
+
                 Surface(
 
                     modifier = Modifier.fillMaxSize(),
