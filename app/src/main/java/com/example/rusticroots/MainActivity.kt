@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rusticroots.model.data.MenuItem
+import com.example.rusticroots.model.data.tableID
 import com.example.rusticroots.ui.modules.GooglePayButton
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.PaymentGViewModel
@@ -167,22 +168,32 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     val vm: ReservationsViewModel = viewModel()
+    vm.anonLogin()
 
-    //vm.createTable(1)
-    //vm.createBooking("table_1", Date(), Date())
+    //vm.createTable(2)
+    //vm.createBooking(1, Date(), Date())
 
     /*TESTER CODE*/
-    Column() {
-        Button(onClick = { vm.getAllTables() }) {
+    Column {
+
+        Button(onClick = { vm.getBookingsByUser() }) {
             Text(text = "Get Table descriptions")
         }
-        LazyColumn(){
-            items(items= vm.allTables){
-                Divider(thickness = 5.dp)
-                Text(text = it.toString() + it.available.toString())
-            }
-        }
+        PrintTables()
     }//*/
 
 
 }
+
+@Composable
+fun PrintTables() {
+    val vm: ReservationsViewModel = viewModel()
+
+    LazyColumn(){
+        items(items= vm.userBookings){
+            Divider(thickness = 5.dp)
+            Text(text = it.toString())
+        }
+    }
+}
+
