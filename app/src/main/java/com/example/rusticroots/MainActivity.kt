@@ -171,38 +171,22 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     val vm: ReservationsViewModel = viewModel()
-    vm.anonLogin()
+    //vm.anonLogin()
     vm.getAllBookings()
     vm.getAllTables()
-    vm.createBooking(2, LocalDateTime.now(), LocalDateTime.now().plusHours(1))
+    //vm.createBooking(2, LocalDateTime.now(), LocalDateTime.now().plusHours(1))
     /*TESTER CODE*/
 
     Column {
 
         Button(onClick = {
-            vm.checkTableAvailability(LocalDateTime.now().hour)
+            vm.checkTableAvailability(LocalDateTime.now().plusHours(2).hour)
 
         }) {
             Text(text = "Get Booking")
         }
         LazyColumn() {
             items(items = vm.allValidBookings) {
-                Divider(thickness = 5.dp)
-                Text(text = it.toString())
-            }
-        }
-        Button(onClick = {
-            vm.allTables.forEach{
-                if (it.available){
-                    vm.t.add(it)
-                }
-            }
-        }) {
-            Text(text = "Get Table")
-
-        }
-        LazyColumn(){
-            items(items = vm.t){
                 Divider(thickness = 5.dp)
                 Text(text = it.toString())
             }

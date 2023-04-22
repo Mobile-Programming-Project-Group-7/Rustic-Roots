@@ -16,7 +16,6 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
-import java.sql.Time
 import java.time.*
 import java.util.*
 
@@ -38,17 +37,15 @@ class ReservationsViewModel: ViewModel() {
     private var _userBookings = mutableStateListOf<Booking>()
     val userBookings: List<Booking> = _userBookings
 
-    var tableRef = mutableStateOf<Tables?>(null)
-
-    var t = mutableStateListOf<Tables>()
-
-    private fun Date.toLocalDateTime(zone: ZoneId = ZoneId.systemDefault()): LocalDateTime = this.toInstant().atZone(zone).toLocalDateTime()
     /**
-     * Converts LocalDateTime to Date object
+     * Converters:
+     * Date to LocalDateTime object
+     * LocalDateTime to Date object
+     * (OLD CODE: Timestamp to LocalDateTime)
      */
+    private fun Date.toLocalDateTime(zone: ZoneId = ZoneId.systemDefault()): LocalDateTime = this.toInstant().atZone(zone).toLocalDateTime()
     private fun LocalDateTime.toDate(zone: ZoneId = ZoneId.systemDefault()): Date = Date.from(this.atZone(zone).toInstant())
-    private fun Timestamp.toLocalDateTime(zone: ZoneId = ZoneId.systemDefault()): LocalDateTime = LocalDateTime.ofInstant(
-        Instant.ofEpochMilli(seconds * 1000 + nanoseconds / 1000000), zone)
+    //private fun Timestamp.toLocalDateTime(zone: ZoneId = ZoneId.systemDefault()): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(seconds * 1000 + nanoseconds / 1000000), zone)
 
 
     /**
@@ -121,6 +118,7 @@ class ReservationsViewModel: ViewModel() {
 
     /**
      * Gets the booking document by the user ID
+     * NEEDS USER ID
      */
     fun getBookingsByUser() {
         viewModelScope.launch {
@@ -152,12 +150,7 @@ class ReservationsViewModel: ViewModel() {
         val time = LocalDateTime.of(date, LocalTime.of(hour, minute))
         val minTime = time.plusMinutes(30)
         allValidBookings.forEach {
-            Log.e("****TIMESTART*******${it.ref_tableID}", it.time_start.toString())
-            Log.e("****TIMEEND*******${it.ref_tableID}", it.time_end.toString())
-            Log.e("****TIME*******", time.toDate().toString())
-            Log.e("****MINTIME*******", minTime.toDate().toString())
-
-            val table = _allTables.filter { table -> it.ref_tableID == table.tableID }
+            val table = allTables.filter { table -> it.ref_tableID == table.tableID }
             if (it.time_start < minTime.toDate() && time.toDate() < it.time_end) {
                 table[0].available = false
             }
@@ -173,12 +166,6 @@ class ReservationsViewModel: ViewModel() {
             user.value?.let {
                 val booking =
                     Booking(tableID(tableID), it.uid, timeStart.toDate(), timeEnd.toDate())
-                Log.e("TEST", LocalDateTime.now().plusHours(1).toDate().toString())
-                Log.e("TIMESTART", timeStart.toString())
-                Log.e("TIMESTART.TODATE", timeStart.toDate().toString())
-                Log.e("TIMEEND", timeEnd.toString())
-                Log.e("TIMEEND.TODATE", timeEnd.toDate().toString())
-                Log.e("BOOKING", booking.toString())
                 db.collection(COLLECTION_BOOKINGS)
                     .add(booking)
                     .addOnSuccessListener {
@@ -197,7 +184,6 @@ class ReservationsViewModel: ViewModel() {
      */
     fun anonLogin() {
         viewModelScope.launch {
-            Log.e("TEST", LocalDateTime.now().plusHours(1).toDate().toString())
             Firebase.auth.signInAnonymously().addOnSuccessListener {
                 user.value = it.user
                 Log.d("******", "Anon sign in done!!")
