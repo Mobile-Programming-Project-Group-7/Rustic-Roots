@@ -94,6 +94,7 @@ fun AppBar() {
         IconButton(onClick={  }) {
             Icon(imageVector=Icons.Outlined.FavoriteBorder, contentDescription="", tint= Color.White)
         }
+
         IconButton(onClick={}) {
 
             Icon(imageVector=Icons.Outlined.Notifications, contentDescription="", tint = Color.White)
@@ -103,7 +104,7 @@ fun AppBar() {
 
 @Composable
 fun Content(){
-    Column() {
+    Column {
         Header()
         Spacer(modifier= Modifier.height(16.dp))
         Promotions()
@@ -119,10 +120,10 @@ fun Content(){
 fun Header() {
         Card(
             Modifier
-                .height(64.dp)
+                .height(60.dp)
                 .padding(horizontal=16.dp),
             elevation=4.dp,
-            shape=RoundedCornerShape(8.dp)
+            shape=RoundedCornerShape(10.dp)
         ) {
             Row(
                 Modifier.fillMaxSize(),
@@ -202,20 +203,20 @@ fun Promotions(){
     ){
         item{
         PromotionItem(
-            imagePainter = painterResource(id = R.drawable.promotion),
+            imagePainter = painterResource(id = R.drawable.saladpromotion),
             title = "Salad",
             subtitle = "Discount",
             header = "20%",
-            backgroundColor = Color(0xff6EB6F5)
+            backgroundColor = Color(0xFF53B857)
         )
     }
         item{
             PromotionItem(
-                imagePainter = painterResource(id = R.drawable.promotion),
+                imagePainter = painterResource(id = R.drawable.pastapromotion),
                 title = "Pasta",
                 subtitle = "Start @",
                 header = "€20",
-                backgroundColor = MaterialTheme.colors.primary
+                backgroundColor =Color(0xFFE96359)
             )
 
         }

@@ -7,5 +7,7 @@
         <item name="postSplashScreenTheme">@style/Theme.RusticRoots</item>
     </style>
     <style name="Theme.RusticRoots" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/purple_500</item>
+
     </style>
 </resources>
