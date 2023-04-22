@@ -1,8 +1,5 @@
 package com.example.rusticroots.pages
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -29,17 +26,7 @@ import com.example.rusticroots.R
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 
 
-class MainScreen : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MainTheme {
-                HomeScreen()
-                }
-            }
-        }
 
-}
 @Composable
 fun MainTheme(content: @Composable () -> Unit) {
     RusticRootsTheme {
@@ -72,7 +59,7 @@ fun HomeScreen(){
             Content()
         }
     }
-        }
+}
 
 
 

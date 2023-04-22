@@ -1,27 +1,30 @@
 package com.example.rusticroots
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
-import androidx.compose.material.icons.filled.*
 import com.example.rusticroots.pages.HomeScreen
-import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import com.example.rusticroots.ui.theme.RusticRootsTheme
-import java.util.*
 
 class MainActivity : ComponentActivity() {
-
-
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContent {
             RusticRootsTheme {
-                HomeScreen()
-            } }}}
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    HomeScreen()
+                }
+            }
+        }
+    }
+}
 /*
                val scaffoldState=rememberScaffoldState()
                 val scope=rememberCoroutineScope()
