@@ -56,7 +56,7 @@ class ReservationsViewModel: ViewModel() {
         val id = tableID(tableID)
         val table = Tables(id, description, seats)
         viewModelScope.launch {
-            db.collection("tables")
+            db.collection(COLLECTION_TABLES)
                 .document(id)
                 .set(table)
                 .addOnSuccessListener {
