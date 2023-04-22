@@ -1,8 +1,9 @@
 package com.example.rusticroots.model.data
 
-import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
-import java.util.Date
+import java.time.LocalDateTime
+import java.util.*
 
 
 /**
@@ -14,14 +15,13 @@ data class Tables(
     @get:Exclude val tableID: String,
     val description: String,
     val seats: Long,
-){ @get:Exclude val available: Boolean = true }
+){ @get:Exclude var available: Boolean = true }
 
 
 fun tableID(num: Int): String = "table_$num"
 
 data class Booking(
-
-    val ref_tableID: DocumentReference,
+    val ref_tableID: String,
     val ref_userID: String,
     val time_start: Date,
     val time_end: Date,

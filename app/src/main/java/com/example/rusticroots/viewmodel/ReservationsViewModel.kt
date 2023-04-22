@@ -12,36 +12,50 @@ import com.example.rusticroots.model.data.Tables
 import com.example.rusticroots.model.data.tableID
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
+import java.sql.Time
+import java.time.*
 import java.util.*
 
 class ReservationsViewModel: ViewModel() {
     private val db = Firebase.firestore
+
     //TODO user Auth
     var user = mutableStateOf<FirebaseUser?>(null)
 
+    //Holds information about all the Tables in the restaurant
     private var _allTables = mutableStateListOf<Tables>()
     val allTables: List<Tables> = _allTables
 
-    private var _allBookings = mutableStateListOf<Booking>()
-    val allBookings: List<Booking> = _allBookings
+    //Holds information about all of the bookings that are not expired
+    private var _allValidBookings = mutableStateListOf<Booking>()
+    val allValidBookings: List<Booking> = _allValidBookings
 
+    //Holds all the Bookings a user made
     private var _userBookings = mutableStateListOf<Booking>()
     val userBookings: List<Booking> = _userBookings
 
     var tableRef = mutableStateOf<Tables?>(null)
 
-    private fun createTableDocRef(id: Int): DocumentReference = db.document("$COLLECTION_TABLES/table_$id")
+    var t = mutableStateListOf<Tables>()
+
+    private fun Date.toLocalDateTime(zone: ZoneId = ZoneId.systemDefault()): LocalDateTime = this.toInstant().atZone(zone).toLocalDateTime()
+    /**
+     * Converts LocalDateTime to Date object
+     */
+    private fun LocalDateTime.toDate(zone: ZoneId = ZoneId.systemDefault()): Date = Date.from(this.atZone(zone).toInstant())
+    private fun Timestamp.toLocalDateTime(zone: ZoneId = ZoneId.systemDefault()): LocalDateTime = LocalDateTime.ofInstant(
+        Instant.ofEpochMilli(seconds * 1000 + nanoseconds / 1000000), zone)
 
 
     /**
      * Creates a table with a specified document ID
      * document id will have the structure of "table_x" where x is the passed integer
      */
-    fun createTable(tableID: Int, description: String = "Round table", seats: Long = 2){
+    fun createTable(tableID: Int, description: String = "Round table", seats: Long = 2) {
         val id = tableID(tableID)
         val table = Tables(id, description, seats)
         viewModelScope.launch {
@@ -61,13 +75,13 @@ class ReservationsViewModel: ViewModel() {
      * Grabs all the Tables in the database.
      * Creates a list of 'data class Tables()' and adds them to ViewModel var "allTables"
      */
-    fun getAllTables(){
+    fun getAllTables() {
         viewModelScope.launch {
             db.collection(COLLECTION_TABLES)
                 .get()
                 .addOnSuccessListener {
                     val tables = mutableStateListOf<Tables>()
-                    it.documents.forEach{ doc ->
+                    it.documents.forEach { doc ->
                         val desc = doc.get("description") as String
                         val seats = doc.get("seats") as Long
                         tables.add(Tables(doc.id, desc, seats))
@@ -79,9 +93,36 @@ class ReservationsViewModel: ViewModel() {
     }
 
     /**
+     * Grabs all the upcoming bookings
+     * !! WIll NOT GRAB PAST BOOKINGS
+     */
+    fun getAllBookings() {
+        viewModelScope.launch {
+            db.collection(COLLECTION_BOOKINGS)
+                .whereGreaterThanOrEqualTo("time_end", Timestamp.now())
+                .get().addOnSuccessListener {
+                    val docs = mutableStateListOf<Booking>()
+                    it.documents.forEach { doc ->
+                        val tId = doc.get("ref_tableID") as String
+                        val uId = doc.get("ref_userID") as String
+                        val start = doc.get("time_start") as Timestamp
+                        val end = doc.get("time_end") as Timestamp
+                        docs.add(Booking(tId, uId, start.toDate(), end.toDate(), doc.id))
+                    }
+                    _allValidBookings.clear()
+                    _allValidBookings.addAll(docs)
+                }
+                .addOnFailureListener {
+                    Log.e("!!!!!!!getAllBookings!!!!!!!!", it.message.toString())
+                }
+
+        }
+    }
+
+    /**
      * Gets the booking document by the user ID
      */
-    fun getBookingsByUser(){
+    fun getBookingsByUser() {
         viewModelScope.launch {
             user.value?.let { fUser ->
                 db.collection(COLLECTION_BOOKINGS)
@@ -89,72 +130,74 @@ class ReservationsViewModel: ViewModel() {
                     .get().addOnSuccessListener {
                         val docs = mutableStateListOf<Booking>()
                         it.documents.forEach { doc ->
-                            val tId = doc.get("ref_tableID") as DocumentReference
+                            val tId = doc.get("ref_tableID") as String
                             val uId = doc.get("ref_userID") as String
-                            val start = doc.get("time_start") as com.google.firebase.Timestamp
-                            val end = doc.get("time_end") as com.google.firebase.Timestamp
+                            val start = doc.get("time_start") as Timestamp
+                            val end = doc.get("time_end") as Timestamp
                             docs.add(Booking(tId, uId, start.toDate(), end.toDate(), doc.id))
                         }
                         _userBookings.clear()
                         _userBookings.addAll(docs)
                     }
                     .addOnFailureListener {
-                        Log.e("!!!!!!!!!!!!!!!!!!!!!!!!!!!!", it.message.toString())
+                        Log.e("!!!!!!getBookingsByUser!!!!!!", it.message.toString())
                     }
             }
 
         }
     }
 
-    /**
-     * Pass Booking data class to retrieve table info from cloud
-     * Returns Tables data class
-     */
-    fun getTableFromBooking(booking: Booking): Tables? {
-        booking.ref_tableID.get()
-            .addOnSuccessListener {
-                val desc = it.get("description") as String
-                val seats = it.get("seats") as Long
-
-                tableRef.value = Tables(booking.ref_tableID.id, desc, seats)
-            }
-        return tableRef.value
-    }
-
     //TODO
-    fun checkTableAvailability(booking: Booking): Boolean {
-        val id = booking.ref_tableID
+    fun checkTableAvailability(hour: Int, minute: Int = 0, date: LocalDate = LocalDate.now()) {
+        val time = LocalDateTime.of(date, LocalTime.of(hour, minute))
+        val minTime = time.plusMinutes(30)
+        allValidBookings.forEach {
+            Log.e("****TIMESTART*******${it.ref_tableID}", it.time_start.toString())
+            Log.e("****TIMEEND*******${it.ref_tableID}", it.time_end.toString())
+            Log.e("****TIME*******", time.toDate().toString())
+            Log.e("****MINTIME*******", minTime.toDate().toString())
 
-        val table = allTables[1]
-        //if (){        }
-        return table.available
+            val table = _allTables.filter { table -> it.ref_tableID == table.tableID }
+            if (it.time_start < minTime.toDate() && time.toDate() < it.time_end) {
+                table[0].available = false
+            }
+            Log.e("***********AVAILABLE", table[0].available.toString())
+        }
     }
 
-    /**
-     * Creates a booking
-     */
-    fun createBooking(tableID: Int, timeStart: Date, timeEnd:Date){
+        /**
+         * Creates a booking
+         */
+    fun createBooking(tableID: Int, timeStart: LocalDateTime, timeEnd: LocalDateTime) {
         viewModelScope.launch {
             user.value?.let {
-                val booking = Booking(createTableDocRef(tableID), it.uid, timeStart, timeEnd)
-
+                val booking =
+                    Booking(tableID(tableID), it.uid, timeStart.toDate(), timeEnd.toDate())
+                Log.e("TEST", LocalDateTime.now().plusHours(1).toDate().toString())
+                Log.e("TIMESTART", timeStart.toString())
+                Log.e("TIMESTART.TODATE", timeStart.toDate().toString())
+                Log.e("TIMEEND", timeEnd.toString())
+                Log.e("TIMEEND.TODATE", timeEnd.toDate().toString())
+                Log.e("BOOKING", booking.toString())
                 db.collection(COLLECTION_BOOKINGS)
                     .add(booking)
                     .addOnSuccessListener {
                         Log.d("******", "Booking created!")
                     }
-                    .addOnFailureListener {err ->
-                        Log.e("******", err.message.toString())
+                    .addOnFailureListener { err ->
+                        Log.e("!!!!!!!!BOOKING CREATION FAILED!!!!!!!", err.message.toString())
                     }
             }
         }
     }
 
+    //TODO
     /**
      * Creates an anonymous user
      */
-    fun anonLogin(){
+    fun anonLogin() {
         viewModelScope.launch {
+            Log.e("TEST", LocalDateTime.now().plusHours(1).toDate().toString())
             Firebase.auth.signInAnonymously().addOnSuccessListener {
                 user.value = it.user
                 Log.d("******", "Anon sign in done!!")

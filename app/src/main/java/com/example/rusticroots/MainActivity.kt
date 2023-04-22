@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rusticroots.model.data.MenuItem
+import com.example.rusticroots.model.data.Tables
 import com.example.rusticroots.model.data.tableID
 import com.example.rusticroots.ui.modules.GooglePayButton
 import com.example.rusticroots.ui.theme.RusticRootsTheme
@@ -28,7 +29,9 @@ import com.example.rusticroots.viewmodel.ReservationsViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import java.util.*
+import kotlin.collections.List
 
 class MainActivity : ComponentActivity() {
 
@@ -169,30 +172,40 @@ class MainActivity : ComponentActivity() {
 fun MyApp() {
     val vm: ReservationsViewModel = viewModel()
     vm.anonLogin()
-
-    //vm.createTable(2)
-    //vm.createBooking(1, Date(), Date())
-
+    vm.getAllBookings()
+    vm.getAllTables()
+    vm.createBooking(2, LocalDateTime.now(), LocalDateTime.now().plusHours(1))
     /*TESTER CODE*/
+
     Column {
 
-        Button(onClick = { vm.getBookingsByUser() }) {
-            Text(text = "Get Table descriptions")
+        Button(onClick = {
+            vm.checkTableAvailability(LocalDateTime.now().hour)
+
+        }) {
+            Text(text = "Get Booking")
         }
-        PrintTables()
-    }//*/
+        LazyColumn() {
+            items(items = vm.allValidBookings) {
+                Divider(thickness = 5.dp)
+                Text(text = it.toString())
+            }
+        }
+        Button(onClick = {
+            vm.allTables.forEach{
+                if (it.available){
+                    vm.t.add(it)
+                }
+            }
+        }) {
+            Text(text = "Get Table")
 
-
-}
-
-@Composable
-fun PrintTables() {
-    val vm: ReservationsViewModel = viewModel()
-
-    LazyColumn(){
-        items(items= vm.userBookings){
-            Divider(thickness = 5.dp)
-            Text(text = it.toString())
+        }
+        LazyColumn(){
+            items(items = vm.t){
+                Divider(thickness = 5.dp)
+                Text(text = it.toString())
+            }
         }
     }
 }
