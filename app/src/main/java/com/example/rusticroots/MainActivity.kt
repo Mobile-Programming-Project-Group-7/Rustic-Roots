@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material.*
 import androidx.compose.material.icons.filled.*
 import com.example.rusticroots.pages.HomeScreen
+import androidx.compose.runtime.*
 import com.example.rusticroots.ui.theme.RusticRootsTheme
+import java.util.*
 
 class MainActivity : ComponentActivity() {
 
@@ -25,12 +28,14 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState=scaffoldState,
                     topBar={
-                        NavBar {
-                            scope.launch {
-                                scaffoldState.drawerState.open()
-                            }
+                        AppBar(
+                            onNavigationIconClick={
+                                scope.launch {
+                                    scaffoldState.drawerState.open()
+                                }
 
-                        }
+                            }
+                        )
                     },
                     drawerContent={
                         DrawerHeader()
@@ -140,9 +145,28 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MyApp(paymentGVM: PaymentGViewModel) {
-    Column() {
-        GooglePayButton(paymentGVM = paymentGVM)
+fun MyApp() {
+    val vm: ReservationsViewModel = viewModel()
+    //vm.anonLogin()
+    vm.getAllBookings()
+    vm.getAllTables()
+    //vm.createBooking(2, LocalDateTime.now(), LocalDateTime.now().plusHours(1))
+    /*TESTER CODE*/
+
+    Column {
+
+        Button(onClick = {
+            vm.checkTableAvailability(LocalDateTime.now().plusHours(2).hour)
+
+        }) {
+            Text(text = "Get Booking")
+        }
+        LazyColumn() {
+            items(items = vm.allValidBookings) {
+                Divider(thickness = 5.dp)
+                Text(text = it.toString())
+            }
+        }
     }
 }
 */

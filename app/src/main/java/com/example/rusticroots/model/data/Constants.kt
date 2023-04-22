@@ -55,4 +55,7 @@ object Constants {
      */
     const val MERCHANT_NAME = "RusticRoots"
     const val MERCHANT_ID = "01234567890123456789"
+
+    const val COLLECTION_BOOKINGS = "bookings"
+    const val COLLECTION_TABLES = "tables"
 }
