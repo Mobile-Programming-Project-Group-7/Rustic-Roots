@@ -1,17 +1,19 @@
 package com.example.rusticroots
 
 import android.os.Bundle
+import android.window.SplashScreen
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import com.example.rusticroots.pages.HomeScreen
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
             RusticRootsTheme {
