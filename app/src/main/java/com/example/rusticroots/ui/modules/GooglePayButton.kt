@@ -44,13 +44,14 @@ fun GooglePayButton(paymentGVM: PaymentGViewModel) {
         }
     }
 
-    val temp: (PendingIntent) -> Unit = { r -> resolvePaymentForResult.launch(
+    // Passes val resolvePaymentForResult to the requestPayment() function
+    val resolvePayment: (PendingIntent) -> Unit = { r -> resolvePaymentForResult.launch(
         IntentSenderRequest.Builder(r).build()
     )}
 
     Button(
         onClick = {
-            Test(paymentGVM, temp)
+            requestPayment(paymentGVM, resolvePayment)
         },
         modifier = Modifier
             .padding(8.dp)
@@ -65,7 +66,7 @@ fun GooglePayButton(paymentGVM: PaymentGViewModel) {
     }
 }
 
-fun Test(paymentGVM: PaymentGViewModel, mytest: (PendingIntent) -> Unit){
+private fun requestPayment(paymentGVM: PaymentGViewModel, resolvePayment: (PendingIntent) -> Unit){
     val dummyPriceCents = 100L
     val shippingCostCents = 900L
     val task = paymentGVM.getLoadPaymentDataTask(dummyPriceCents + shippingCostCents)
@@ -79,7 +80,7 @@ fun Test(paymentGVM: PaymentGViewModel, mytest: (PendingIntent) -> Unit){
             when (val exception = completedTask.exception) {
                 is ResolvableApiException -> {
                     Log.d("*************************", "ResolvableApiException")
-                    mytest(exception.resolution)
+                    resolvePayment(exception.resolution)
                 }
                 is ApiException -> {
                     handleError(exception.statusCode, exception.message)
