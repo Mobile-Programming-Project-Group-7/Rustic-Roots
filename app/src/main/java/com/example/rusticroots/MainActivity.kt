@@ -1,17 +1,24 @@
 package com.example.rusticroots
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import com.example.rusticroots.pages.HomeScreen
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Observer
 import com.example.rusticroots.ui.theme.RusticRootsTheme
+import com.example.rusticroots.viewmodel.PaymentGViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-
+        val paymentGVM: PaymentGViewModel by viewModels() // = PaymentGViewModel(this.application)
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
             RusticRootsTheme {
@@ -22,6 +29,23 @@ class MainActivity : ComponentActivity() {
                     HomeScreen()
                 }
             }
+        }
+        // Check Google Pay availability
+        paymentGVM.canUseGooglePay.observe(this, Observer(::setGooglePayAvailable))
+    }
+    /**
+     * If Google pay is not available, user gets notified
+     */
+    private fun setGooglePayAvailable(available: Boolean) {
+        if (available) {
+            Log.d("**********************","AVAILABLE")
+        } else {
+            Toast.makeText(
+                this,
+                getString(R.string.google_pay_NA),
+                Toast.LENGTH_LONG
+            ).show()
+            Log.e("**********************","NOT AVAILABLE")
         }
     }
 }
@@ -89,63 +113,6 @@ class MainActivity : ComponentActivity() {
                     }){
 
                 }
-
-
-                      val paymentGVM: PaymentGViewModel by viewModels() // = PaymentGViewModel(this.application)
-
-
-                val db=Firebase.firestore;
-                val user=hashMapOf(
-                    "first" to "Adaddd",
-                    "last" to "Lovelace",
-                    "born" to 1815
-                )
-                db.collection("users")
-                    .add(user)
-                    .addOnSuccessListener { d ->
-                        Log.i("DocumentSnapshot added with ID", "created successfully")
-                    }
-                    .addOnFailureListener { e ->
-                        Log.i("Error adding document", e.toString())
-                    }
-// These four closing  bracket are kept because of commenting below payment codes.
-            }}}}
-
-
-                // A surface container using the 'background' color from the theme
-
-
-
-                Surface(
-
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    MyApp(paymentGVM = paymentGVM)
-                }
-            }
-        }
-        // Check Google Pay availability
-        val paymentGVM: PaymentGViewModel by viewModels() // = PaymentGViewModel(this.application)
-
-        paymentGVM.canUseGooglePay.observe(this, Observer(::setGooglePayAvailable) )
-    }
-    /**
-     * If Google pay is not available, user gets notified
-     */
-    private fun setGooglePayAvailable(available: Boolean) {
-        if (available) {
-            Log.d("**********************","AVAILABLE")
-        } else {
-            Toast.makeText(
-                this,
-                getString(R.string.google_pay_NA),
-                Toast.LENGTH_LONG
-            ).show()
-            Log.e("**********************","NOT AVAILABLE")
-        }
-    }
-}
 
 @Composable
 fun MyApp() {
