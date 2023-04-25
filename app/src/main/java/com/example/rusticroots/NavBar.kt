@@ -1,4 +1,4 @@
-    package com.example.rusticroots
+package com.example.rusticroots
 
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -8,8 +8,7 @@ import androidx.compose.ui.res.stringResource
 
 @Composable
 fun AppBar(
-    onNavigationIconClick: () -> Unit,
-    title: () -> Unit
+    onNavigationIconClick: () -> Unit
 ){
     TopAppBar(
         title = {
