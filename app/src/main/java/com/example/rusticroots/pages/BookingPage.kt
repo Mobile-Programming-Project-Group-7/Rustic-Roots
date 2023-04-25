@@ -1,15 +1,19 @@
 package com.example.rusticroots.pages
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,14 +22,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rusticroots.R
 import com.example.rusticroots.ui.theme.RusticRootsTheme
-import com.google.android.material.datepicker.MaterialDatePicker
+import com.example.rusticroots.viewmodel.ReservationsViewModel
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 
 @Preview(showBackground = true)
@@ -40,6 +53,10 @@ fun BookingPreview() {
 
 @Composable
 fun BookingPage() {
+    val vm: ReservationsViewModel = viewModel()
+    vm.getAllBookings()
+    if (vm._allTables.isEmpty()) vm.getAllTables()
+
     var confirmed by remember { mutableStateOf(false) }
     val isItConfirmed: (Boolean) -> Unit = { confirmed = it}
 
@@ -100,61 +117,12 @@ fun DateScroll() {
 
 @Composable
 fun DetailsScreen(indexMe: (tabIndex: Int) -> Unit ,isItConfirmed: (confirmed: Boolean) -> Unit) {
-    var dayIndex by remember { mutableStateOf(0) }
+    var pickedDate by remember { mutableStateOf(LocalDate.now()) }
 
     Column{
-        Column(modifier = Modifier.height(80.dp)) {
-            ColumnTitle(title = "Date")
-            val datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select date")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build()
-
-
-            /*Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-
-                    IconButton(onClick = { if (dayIndex >= 1) dayIndex-- }) {
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
-                            contentDescription = "Go back a day",
-                            modifier = Modifier.scale(1.25f),
-                            tint = if (dayIndex == 0) Color.Transparent.copy(0.5f) else MaterialTheme.colors.onBackground
-                        )
-                    }
-                    Text(
-                        text = "Previous"
-                    )
-                }
-                Button(onClick = { /*TODO*/ }) {
-                    
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Previous"
-                    )
-                    IconButton(onClick = { if (dayIndex >= 1) dayIndex-- }) {
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowForward,
-                            contentDescription = "Go back a day",
-                            modifier = Modifier.scale(1.25f),
-                            tint = if (dayIndex == 0) Color.Transparent.copy(0.5f) else MaterialTheme.colors.onBackground
-                        )
-                    }
-
-                }
-            }*/
-
-
-        }
-
+        pickedDate = BookingDatePicker()
         Divider()
-        ColumnTitle(title = "Hour")
+        BookingTimePicker()
         Divider()
         ColumnTitle(title = "Number of Guests")
         Divider()
@@ -179,6 +147,100 @@ fun DetailsScreen(indexMe: (tabIndex: Int) -> Unit ,isItConfirmed: (confirmed: B
 @Composable
 fun SummaryScreen() {
     Text(text = "title")
+}
+
+@Composable
+fun BookingTimePicker() {
+    val vm: ReservationsViewModel = viewModel()
+    Column(
+        modifier = Modifier
+            .height(80.dp)
+    ) {
+        ColumnTitle(title = "Hour")
+        LazyRow(
+            modifier = Modifier
+                .padding(horizontal = 32.dp)
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            items(items = (11..22).toList()
+            ){
+                Text(text = it.toString())
+            }
+        }
+    }
+}
+
+@Composable
+fun BookingDatePicker(): LocalDate {
+    val context = LocalContext.current
+    var pickedDate by remember {
+        mutableStateOf(
+            if (LocalDate.now().dayOfWeek < DayOfWeek.WEDNESDAY)
+                LocalDate.now().plusDays(DayOfWeek.WEDNESDAY.value.toLong() - LocalDate.now().dayOfWeek.value)
+            else
+                LocalDate.now()
+        )
+    }
+    val formattedDate by remember {
+        derivedStateOf { DateTimeFormatter.ofPattern("MMM dd yyyy").format(pickedDate) }
+    }
+    val dateDialogState = rememberMaterialDialogState()
+    
+    Column(
+        modifier = Modifier
+            .height(80.dp)
+            .clickable {
+                dateDialogState.show()
+            },
+    ) {
+        ColumnTitle(title = "Date")
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 32.dp)
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(
+                modifier = Modifier.scale(1.3f),
+                imageVector = Icons.Filled.DateRange,
+                contentDescription = "Pick Date"
+            )
+            Text(
+                color = MaterialTheme.colors.primary,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                text = formattedDate.toString()
+            )
+        }
+    }
+    MaterialDialog(
+        dialogState = dateDialogState,
+        buttons = {
+            positiveButton(text = "Set") {
+                Toast.makeText(
+                    context,
+                    "Date set",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            negativeButton(text = "Cancel")
+        }
+    ) {
+        datepicker(
+            yearRange = LocalDate.now().year..LocalDate.now().plusYears(1).year,
+            initialDate = pickedDate,
+            title = "Pick a date",
+            allowedDateValidator = {
+                it.isAfter(LocalDate.now()) && it.dayOfWeek >= DayOfWeek.WEDNESDAY
+            }
+        ) {
+            pickedDate = it
+        }
+    }
+    return pickedDate
 }
 
 /**
