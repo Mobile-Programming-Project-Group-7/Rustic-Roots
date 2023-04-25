@@ -8,6 +8,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.rusticroots.R
 import com.example.rusticroots.ui.theme.RusticRootsTheme
+import com.google.android.material.datepicker.MaterialDatePicker
 
 
 @Preview(showBackground = true)
@@ -38,10 +41,14 @@ fun BookingPreview() {
 @Composable
 fun BookingPage() {
     var confirmed by remember { mutableStateOf(false) }
+    val isItConfirmed: (Boolean) -> Unit = { confirmed = it}
+
     var tabIndex by remember { mutableStateOf(0) }
+    val indexMe: (Int) -> Unit = { tabIndex = it }
+
     val tabs = listOf("Details", "Summary")
     Column {
-        PageTop()
+        PageTop() //TODO please add functionality to the iconbutton
         TabRow(
             selectedTabIndex = tabIndex,
             modifier = Modifier.height(72.dp),
@@ -68,8 +75,7 @@ fun BookingPage() {
                 )
             }
         }
-        val isItConfirmed: (Boolean) -> Unit = { confirmed = it}
-        val indexMe: (Int) -> Unit = { tabIndex = it }
+
         when (tabIndex) {
             0 -> DetailsScreen(indexMe, isItConfirmed)
             1 -> SummaryScreen()
@@ -88,9 +94,65 @@ fun ColumnTitle(title: String) {
 }
 
 @Composable
+fun DateScroll() {
+    
+}
+
+@Composable
 fun DetailsScreen(indexMe: (tabIndex: Int) -> Unit ,isItConfirmed: (confirmed: Boolean) -> Unit) {
-    Column {
-        ColumnTitle(title = "Date")
+    var dayIndex by remember { mutableStateOf(0) }
+
+    Column{
+        Column(modifier = Modifier.height(80.dp)) {
+            ColumnTitle(title = "Date")
+            val datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select date")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build()
+
+
+            /*Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                    IconButton(onClick = { if (dayIndex >= 1) dayIndex-- }) {
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowBack,
+                            contentDescription = "Go back a day",
+                            modifier = Modifier.scale(1.25f),
+                            tint = if (dayIndex == 0) Color.Transparent.copy(0.5f) else MaterialTheme.colors.onBackground
+                        )
+                    }
+                    Text(
+                        text = "Previous"
+                    )
+                }
+                Button(onClick = { /*TODO*/ }) {
+                    
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Previous"
+                    )
+                    IconButton(onClick = { if (dayIndex >= 1) dayIndex-- }) {
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowForward,
+                            contentDescription = "Go back a day",
+                            modifier = Modifier.scale(1.25f),
+                            tint = if (dayIndex == 0) Color.Transparent.copy(0.5f) else MaterialTheme.colors.onBackground
+                        )
+                    }
+
+                }
+            }*/
+
+
+        }
+
         Divider()
         ColumnTitle(title = "Hour")
         Divider()
@@ -98,11 +160,17 @@ fun DetailsScreen(indexMe: (tabIndex: Int) -> Unit ,isItConfirmed: (confirmed: B
         Divider()
         ColumnTitle(title = "Duration")
         Divider()
-        Button(onClick = {
-            isItConfirmed(true)
-            indexMe(1)
-        }) {
-            Text(text = "Continue")
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
+            shape = RoundedCornerShape(50),
+            onClick = {
+                isItConfirmed(true)
+                indexMe(1)
+            }
+        ) {
+            Text(fontWeight = FontWeight.Bold, text = "Continue")
         }
     }
 
