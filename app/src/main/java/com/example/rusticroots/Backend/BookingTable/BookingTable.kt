@@ -4,12 +4,13 @@ import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.*
+import java.util.UUID.*
 
 class BookingTable {
     val db = Firebase.firestore;
 
     fun addtable(tableName:String){
-        var tableId: String = UUID.randomUUID().toString();
+        var tableId: String = randomUUID().toString();
         var status: String = "available";
         db.collection("table")
             .add(tableData(tableId, tableName, status))
@@ -21,11 +22,11 @@ class BookingTable {
             }
     }
 
-    fun  bookedTable(userId:String, userName:String, tableId:String, tableName:String, date: String){
+    fun  bookedTable(userId:String, tableId:String, tableName:String, date: String){
 
         db.collection("bookedTable")
             .add(tableBookeddata(tableId, tableName, userId,
-                userName, date))
+                date))
             .addOnSuccessListener { d ->
                 Log.i( "table:",  "Table Booked")
             }
