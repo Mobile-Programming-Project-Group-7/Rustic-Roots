@@ -1,4 +1,4 @@
-package com.example.rusticroots.Backend.User
+package com.example.rusticroots.model.User
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
