@@ -7,7 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -97,7 +97,7 @@ fun AppBar() {
 
         IconButton(onClick={}) {
 
-            Icon(imageVector=Icons.Outlined.Notifications, contentDescription="", tint = Color.White)
+            Icon(imageVector=Icons.Outlined.Menu, contentDescription="", tint = Color.White)
         }
     }
 }
@@ -106,11 +106,11 @@ fun AppBar() {
 fun Content(){
     Column {
         Header()
-        Spacer(modifier= Modifier.height(16.dp))
+        Spacer(modifier= Modifier.height(10.dp))
         Promotions()
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         CategorySection()
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
      BestSellerSection()
 
 
@@ -310,12 +310,12 @@ fun CategoryButton(
 ) {
     Column(
         Modifier
-            .width(72.dp)
+            .width(60.dp)
             .clickable { }
     ) {
         Box(
             Modifier
-                .size(72.dp)
+                .size(60.dp)
                 .background(
                     color=backgroundColor,
                     shape=RoundedCornerShape(12.dp)
@@ -411,7 +411,7 @@ fun BestSellerItem(
                 Text(text = title, fontWeight = FontWeight.Bold)
                 Row {
                     Text(
-                        "$${price}",
+                        "€${price}",
                         textDecoration = if (discountPercent > 0)
                             TextDecoration.LineThrough
                         else
