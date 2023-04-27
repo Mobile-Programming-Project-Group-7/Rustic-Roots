@@ -1,9 +1,10 @@
-package com.example.rusticroots
+    package com.example.rusticroots
 
+import android.app.Application
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
+
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,14 @@ import androidx.lifecycle.Observer
 import com.example.rusticroots.pages.Navigation
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.PaymentGViewModel
+
+import com.example.rusticroots.Backend.BookingTable.BookingTable
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+
+
+
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
