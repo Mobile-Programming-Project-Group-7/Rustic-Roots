@@ -11,25 +11,64 @@ import com.google.firebase.ktx.Firebase
 
 
 
-    class MainActivity :ComponentActivity() {
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            setContentView(R.layout.activity_main)
-
-
-            val db = Firebase.firestore;
-            val user = hashMapOf(
-                "first" to "Adaddd",
-                "last" to "Lovelace",
-                "born" to 1815
-            )
-            db.collection("users")
-                .add(user)
-                .addOnSuccessListener { d->
-                    Log.i( "DocumentSnapshot added with ID", "created successfully")
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val paymentGVM: PaymentGViewModel by viewModels() // = PaymentGViewModel(this.application)
+        installSplashScreen()
+        super.onCreate(savedInstanceState)
+        setContent {
+            RusticRootsTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    Navigation()
                 }
-                .addOnFailureListener { e ->
-                    Log.i("Error adding document", e.toString())
-                }
+            }
+        }
+        // Check Google Pay availability
+        paymentGVM.canUseGooglePay.observe(this, Observer(::setGooglePayAvailable))
+    }
+    /**
+     * If Google pay is not available, user gets notified
+     */
+    private fun setGooglePayAvailable(available: Boolean) {
+        if (available) {
+            Log.d("**********************","AVAILABLE")
+        } else {
+            Toast.makeText(
+                this,
+                getString(R.string.google_pay_NA),
+                Toast.LENGTH_LONG
+            ).show()
+            Log.e("**********************","NOT AVAILABLE")
         }
     }
+}
+/*
+@Composable
+fun MyApp() {
+    val vm: ReservationsViewModel = viewModel()
+    //vm.anonLogin()
+    vm.getAllBookings()
+    vm.getAllTables()
+    //vm.createBooking(2, LocalDateTime.now(), LocalDateTime.now().plusHours(1))
+    /*TESTER CODE*/
+
+    Column {
+
+        Button(onClick = {
+            vm.checkTableAvailability(LocalDateTime.now().plusHours(2).hour)
+
+        }) {
+            Text(text = "Get Booking")
+        }
+        LazyColumn() {
+            items(items = vm.allValidBookings) {
+                Divider(thickness = 5.dp)
+                Text(text = it.toString())
+            }
+        }
+    }
+}
+*/
