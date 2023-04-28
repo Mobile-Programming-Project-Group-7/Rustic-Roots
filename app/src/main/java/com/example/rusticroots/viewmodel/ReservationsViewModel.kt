@@ -26,8 +26,9 @@ class ReservationsViewModel: ViewModel() {
     var user = mutableStateOf<FirebaseUser?>(null)
 
     //Holds information about all the Tables in the restaurant
-    private var _allTables = mutableStateListOf<Tables>()
+    var _allTables = mutableStateListOf<Tables>()
     val allTables: List<Tables> = _allTables
+
 
     //Holds information about all of the bookings that are not expired
     private var _allValidBookings = mutableStateListOf<Booking>()
@@ -146,21 +147,30 @@ class ReservationsViewModel: ViewModel() {
     }
 
     //TODO
-    fun checkTableAvailability(hour: Int, minute: Int = 0, date: LocalDate = LocalDate.now()) {
+    fun checkTableAvailability(
+        hour: Int,
+        minute: Int = 0,
+        date: LocalDate = LocalDate.now()
+    ): List<Tables> {
         val time = LocalDateTime.of(date, LocalTime.of(hour, minute))
         val minTime = time.plusMinutes(30)
+        // The returned values
+        var t = mutableStateListOf<Tables>()
+        if (allValidBookings.isEmpty()) return allTables
         allValidBookings.forEach {
             val table = allTables.filter { table -> it.ref_tableID == table.tableID }
             if (it.time_start < minTime.toDate() && time.toDate() < it.time_end) {
                 table[0].available = false
+            } else {
+                t.add(table[0])
             }
-            Log.e("***********AVAILABLE", table[0].available.toString())
         }
+        return t
     }
 
-        /**
-         * Creates a booking
-         */
+    /**
+     * Creates a booking
+     */
     fun createBooking(tableID: Int, timeStart: LocalDateTime, timeEnd: LocalDateTime) {
         viewModelScope.launch {
             user.value?.let {

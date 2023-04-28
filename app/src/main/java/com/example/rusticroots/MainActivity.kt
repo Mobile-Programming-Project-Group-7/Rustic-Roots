@@ -8,10 +8,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
+import androidx.compose.runtime.Composable
 import com.example.rusticroots.pages.HomeScreen
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Observer
+import com.example.rusticroots.pages.BookingPage
+import com.example.rusticroots.pages.MainTheme
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.PaymentGViewModel
 
@@ -49,6 +53,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
 /*
                val scaffoldState=rememberScaffoldState()
                 val scope=rememberCoroutineScope()
