@@ -1,6 +1,6 @@
 package com.example.rusticroots.pages
 
-import android.util.Log
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rusticroots.R
+import com.example.rusticroots.model.data.Tables
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.ReservationsViewModel
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -45,18 +46,19 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun BookingPreview() {
     RusticRootsTheme {
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-           BookingPage()
+        Surface(modifier = Modifier
+            .fillMaxWidth()
+            //.height(80.dp)
+            ,
+            color = MaterialTheme.colors.background) {
+            //DurationPicker(1){}
+            BookingPage()
         }
     }
 }
 
 @Composable
 fun BookingPage() {
-    val vm: ReservationsViewModel = viewModel()
-    vm.getAllBookings()
-    if (vm._allTables.isEmpty()) vm.getAllTables()
-
     var confirmed by remember { mutableStateOf(false) }
     val isItConfirmed: (Boolean) -> Unit = { confirmed = it}
 
@@ -65,7 +67,7 @@ fun BookingPage() {
 
     val tabs = listOf("Details", "Summary")
     Column {
-        PageTop() //TODO please add functionality to the iconbutton
+        PageTop() //TODO please add functionality to the icon button
         TabRow(
             selectedTabIndex = tabIndex,
             modifier = Modifier.height(72.dp),
@@ -111,22 +113,42 @@ fun ColumnTitle(title: String) {
 }
 
 @Composable
-fun DateScroll() {
-    
-}
+fun DetailsScreen(
+    indexMe: (tabIndex: Int) -> Unit ,
+    isItConfirmed: (confirmed: Boolean) -> Unit,
+    vm: ReservationsViewModel = viewModel()
+) {
+    //vm.anonLogin()
+    //vm.createBooking(1, LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(11, 0)), LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(15, 0)))
+    //vm.createBooking(2, LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(11, 0)), LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(15, 0)))
+    //vm.getAllBookings()
+    if (vm._allTables.isEmpty()) vm.getAllTables()
 
-@Composable
-fun DetailsScreen(indexMe: (tabIndex: Int) -> Unit ,isItConfirmed: (confirmed: Boolean) -> Unit) {
     var pickedDate by remember { mutableStateOf(LocalDate.now()) }
+    val setDate: (LocalDate) -> Unit = { pickedDate = it }
+
+    var pickedHour by remember { mutableStateOf(0) }
+    val setHour: (Int) -> Unit = { pickedHour = it }
+
+    var pickedTableList: List<Tables>? by remember { mutableStateOf(null) }
+    val setTableList: (List<Tables>) -> Unit = { pickedTableList = it }
+
+    var guests by remember { mutableStateOf(0) }
+    val setGuest: (Int) -> Unit = { guests = it }
+
+    var duration by remember { mutableStateOf(1) }
+    val setDuration: (Int) -> Unit = { duration = it }
 
     Column{
-        pickedDate = BookingDatePicker()
+        BookingDatePicker(setDate)
         Divider()
-        BookingTimePicker()
+        BookingTimePicker(setHour, setTableList, pickedDate, pickedHour)
         Divider()
-        ColumnTitle(title = "Number of Guests")
+        GuestPicker(guests, setGuest)
         Divider()
-        ColumnTitle(title = "Duration")
+        DurationPicker(duration, setDuration)
+        Divider()
+        TablePicker(pickedTableList)
         Divider()
         Button(
             modifier = Modifier
@@ -150,30 +172,142 @@ fun SummaryScreen() {
 }
 
 @Composable
-fun BookingTimePicker() {
-    val vm: ReservationsViewModel = viewModel()
+fun DurationPicker(selected: Int, setNum: (Int) -> Unit) {
     Column(
         modifier = Modifier
             .height(80.dp)
-    ) {
-        ColumnTitle(title = "Hour")
+    ){
+        ColumnTitle(title = "Duration")
         LazyRow(
             modifier = Modifier
-                .padding(horizontal = 32.dp)
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
+                .fillMaxHeight()
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            items(items = (11..22).toList()
+            items(items = (1..3).toList(),
             ){
-                Text(text = it.toString())
+                Button(
+                    colors = if (it == selected) ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary) else ButtonDefaults.buttonColors(),
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    shape = RoundedCornerShape(50),
+                    onClick = {
+                        setNum(it)
+                    }
+                ) {
+                    Text(
+                        fontWeight = FontWeight.Bold,
+                        text = "$it " + if (it == 1) "hour" else "hours"
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun BookingDatePicker(): LocalDate {
+fun TablePicker(
+    tableList: List<Tables>?,
+    vm: ReservationsViewModel = viewModel()
+){
+
+}
+
+@Composable
+fun GuestPicker(selected: Int, setNum: (Int) -> Unit) {
+    Column(
+        modifier = Modifier
+            .height(80.dp)
+    ){
+        ColumnTitle(title = "Number of Guests")
+        LazyRow(
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxHeight()
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items(items = (1..8).toList(),
+            ){
+                Button(
+                    colors = if (it == selected) ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary) else ButtonDefaults.buttonColors(),
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    shape = RoundedCornerShape(50),
+                    onClick = {
+                        setNum(it)
+                    }
+                ) {
+                    Text(fontWeight = FontWeight.Bold,text = "$it")
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Time Picker
+ * Updates values in parent function
+ */
+@Composable
+fun BookingTimePicker(
+    pickedHour: (Int) -> Unit,
+    pickedTableList: (List<Tables>) -> Unit,
+    pickedDate: LocalDate,
+    selected: Int,
+    vm: ReservationsViewModel = viewModel()
+) {
+
+    Column(
+        modifier = Modifier
+            .height(88.dp)
+            .padding(horizontal = 8.dp)
+    ) {
+        ColumnTitle(title = "Hour")
+        LazyRow(
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxHeight()
+                .fillMaxWidth(),
+            //horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (LocalDate.now() == pickedDate && LocalTime.now().hour >= 20)
+                item { Text(
+                    modifier = Modifier
+                        .padding(horizontal = 36.dp),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = Color.Black.copy(alpha = 0.5f),
+                    text = "No Available Hours"
+                )}
+            else items(items = (if(LocalTime.now().hour > 11) LocalTime.now().hour..20 else 11..20).toList(),
+            ){
+                val list = vm.checkTableAvailability(it, date = pickedDate)
+                Button(
+                    colors = if (it == selected) ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary) else ButtonDefaults.buttonColors(),
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    enabled = list.isNotEmpty(),
+                    shape = RoundedCornerShape(50),
+                    onClick = {
+                        pickedHour(it)
+                        pickedTableList(list)
+                    }
+                ) {
+                    Text(fontWeight = FontWeight.Bold,text = "$it:00")
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Date Picker
+ * Updates values in parent function
+ */
+@Composable
+fun BookingDatePicker(setDate: (LocalDate) -> Unit) {
     val context = LocalContext.current
     var pickedDate by remember {
         mutableStateOf(
@@ -234,13 +368,13 @@ fun BookingDatePicker(): LocalDate {
             initialDate = pickedDate,
             title = "Pick a date",
             allowedDateValidator = {
-                it.isAfter(LocalDate.now()) && it.dayOfWeek >= DayOfWeek.WEDNESDAY
+                it.isAfter(LocalDate.now().minusDays(1)) && it.dayOfWeek >= DayOfWeek.WEDNESDAY
             }
         ) {
             pickedDate = it
+            setDate(it)
         }
     }
-    return pickedDate
 }
 
 /**
