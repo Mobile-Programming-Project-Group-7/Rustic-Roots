@@ -81,5 +81,6 @@ dependencies {
     // SplashScreen
     implementation 'androidx.core:core-splashscreen:1.0.0'
 
+    // Date picker
     implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
 }

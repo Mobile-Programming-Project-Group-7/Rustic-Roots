@@ -6,12 +6,13 @@ import com.example.rusticroots.Backend.BookingTable.tableData
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.*
+import java.util.UUID.*
 
 class Food {
     val db = Firebase.firestore;
 
     fun addFood(foodName:String){
-        var foodId: String = UUID.randomUUID().toString();
+        var foodId: String = randomUUID().toString();
         db.collection("foods")
             .add(addFood(foodId, foodName))
             .addOnSuccessListener { d ->

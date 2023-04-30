@@ -1,9 +1,11 @@
 package com.example.rusticroots
 
+import android.app.Application
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,8 +18,18 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Observer
 import com.example.rusticroots.pages.BookingPage
 import com.example.rusticroots.pages.MainTheme
+
+import com.example.rusticroots.pages.Navigation
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.PaymentGViewModel
+
+import com.example.rusticroots.Backend.BookingTable.BookingTable
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+
+
+
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    HomeScreen()
+                    Navigation()
                 }
             }
         }
@@ -53,73 +65,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
 /*
-               val scaffoldState=rememberScaffoldState()
-                val scope=rememberCoroutineScope()
-                Scaffold(
-                    scaffoldState=scaffoldState,
-                    topBar={
-                        AppBar(
-                            onNavigationIconClick={
-                                scope.launch {
-                                    scaffoldState.drawerState.open()
-                                }
-
-                            }
-                        )
-                    },
-                    drawerContent={
-                        DrawerHeader()
-                        DrawerBody(
-                            items=listOf(
-                                MenuItem(
-                                    "profile",
-                                    title="Profile",
-                                    contentDescription="Go to your profile page",
-                                    icon=Icons.Default.Person
-                                ),
-                                MenuItem(
-                                    "Home",
-                                    title="Home",
-                                    contentDescription="Go to home screen",
-                                    icon=Icons.Default.Home
-                                ),
-                                MenuItem(
-                                    "favourite",
-                                    title="Orders",
-                                    contentDescription="Your favourite orders",
-                                    icon=Icons.Default.Favorite
-                                ),
-                                MenuItem(
-                                    "settings",
-                                    title="Settings",
-                                    contentDescription="Go to settings screen",
-                                    icon=Icons.Default.Settings
-                                ),
-                                MenuItem(
-                                    "feedback",
-                                    title="Feedback",
-                                    contentDescription="Go to feedback screen",
-                                    icon=Icons.Default.Notifications
-                                ),
-
-                                MenuItem(
-                                    "help",
-                                    title="Help",
-                                    contentDescription="Get help",
-                                    icon=Icons.Default.Info
-                                ),
-                            ),
-                            onItemClick={
-                                println("Clicked on ${it.title}")
-                            }
-                        )
-                    }){
-
-                }
-
 @Composable
 fun MyApp() {
     val vm: ReservationsViewModel = viewModel()
