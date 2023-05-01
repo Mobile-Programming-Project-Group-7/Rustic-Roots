@@ -14,11 +14,16 @@ import androidx.lifecycle.Observer
 import com.example.rusticroots.pages.Navigation
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.PaymentGViewModel
-
+import com.example.rusticroots.viewmodel.ReservationsViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val vm: ReservationsViewModel by viewModels()
         val paymentGVM: PaymentGViewModel by viewModels() // = PaymentGViewModel(this.application)
+        val user = Firebase.auth.currentUser
+        if (user == null) vm.anonLogin()
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
@@ -50,30 +55,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-/*
-@Composable
-fun MyApp() {
-    val vm: ReservationsViewModel = viewModel()
-    //vm.anonLogin()
-    vm.getAllBookings()
-    vm.getAllTables()
-    //vm.createBooking(2, LocalDateTime.now(), LocalDateTime.now().plusHours(1))
-    /*TESTER CODE*/
-
-    Column {
-
-        Button(onClick = {
-            vm.checkTableAvailability(LocalDateTime.now().plusHours(2).hour)
-
-        }) {
-            Text(text = "Get Booking")
-        }
-        LazyColumn() {
-            items(items = vm.allValidBookings) {
-                Divider(thickness = 5.dp)
-                Text(text = it.toString())
-            }
-        }
-    }
-}
-*/

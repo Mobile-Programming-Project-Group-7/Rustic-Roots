@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
@@ -59,11 +58,17 @@ fun BookingPreview() {
 
 @Composable
 fun BookingScreen() {
+    //vm.createBooking(2, LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(11, 0)), LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(15, 0)))
+
     var confirmed by remember { mutableStateOf(false) }
     val isItConfirmed: (Boolean) -> Unit = { confirmed = it}
 
     var tabIndex by remember { mutableStateOf(0) }
     val indexMe: (Int) -> Unit = { tabIndex = it }
+
+    var table:List<Tables>? by remember { mutableStateOf(null) }
+    val setTable: (List<Tables>) -> Unit = { table = it }
+    table?.forEach {t-> Log.e("TABLE!!!!!!!!", t.toString())}
 
     val tabs = listOf("Details", "Summary")
     Column {
@@ -96,8 +101,8 @@ fun BookingScreen() {
         }
 
         when (tabIndex) {
-            0 -> DetailsScreen(indexMe, isItConfirmed)
-            1 -> SummaryScreen()
+            0 -> DetailsScreen(setTable, indexMe, isItConfirmed)
+            1 -> SummaryScreen(/*TABLE, StartDateTime, EndDateTime*/)
         }
     }
 }
@@ -114,18 +119,26 @@ fun ColumnTitle(title: String) {
 
 @Composable
 fun DetailsScreen(
+    setTable: (table: List<Tables>) -> Unit,
     indexMe: (tabIndex: Int) -> Unit ,
     isItConfirmed: (confirmed: Boolean) -> Unit,
     vm: ReservationsViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    //vm.anonLogin()
-    //vm.createBooking(1, LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(11, 0)), LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(15, 0)))
-    //vm.createBooking(2, LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(11, 0)), LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(15, 0)))
-    //vm.getAllBookings()
-    if (vm._allTables.isEmpty()) vm.getAllTables()
+    lazy {
+        Log.e("!!GOT BOOKINGS!!", "")
+        vm.getAllBookings()
+    }
+    if (vm.allTables.isEmpty()) vm.getAllTables()
 
-    var pickedDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
+    var pickedDate by rememberSaveable {
+        mutableStateOf(
+            if (LocalDate.now().dayOfWeek < DayOfWeek.WEDNESDAY)
+                    LocalDate.now().plusDays(DayOfWeek.WEDNESDAY.value.toLong() - LocalDate.now().dayOfWeek.value)
+            else
+                LocalDate.now()
+        )
+    }
     val setDate: (LocalDate) -> Unit = { pickedDate = it }
 
     var pickedHour by remember { mutableStateOf(0) }
@@ -145,14 +158,19 @@ fun DetailsScreen(
 
     val bool: Boolean = (pickedTableList != null && pickedHour != 0 && guests != 0)
 
+    if(guests != 0) {
+        pickedTableList?.let { it ->
+            vm.tableSelector(it, guests, setTable)
+        }
+    }
     Column{
-        BookingDatePicker(setDate)
+        BookingDatePicker(pickedDate, setDate)
         Divider()
         BookingTimePicker(setHour, setTableList, pickedDate, pickedHour, setMaxGuest)
         Divider()
         GuestPicker(maxGuests, guests, setGuest)
         Divider()
-        DurationPicker(duration, setDuration)
+        DurationPicker( pickedHour, pickedDate, pickedTableList, duration, setTableList, setDuration)
         Divider()
         Button(
             colors =
@@ -174,6 +192,7 @@ fun DetailsScreen(
                 }else {
                     isItConfirmed(true)
                     indexMe(1)
+
                 }
 
             }
@@ -181,8 +200,8 @@ fun DetailsScreen(
             Text(fontWeight = FontWeight.Bold, text = "Continue")
         }
     }
-
 }
+
 
 @Composable
 fun SummaryScreen() {
@@ -190,7 +209,15 @@ fun SummaryScreen() {
 }
 
 @Composable
-fun DurationPicker(selected: Int, setNum: (Int) -> Unit) {
+fun DurationPicker(
+    pickedHour: Int,
+    pickedDate: LocalDate,
+    pickedTables: List<Tables>?,
+    selected: Int,
+    setTable: (table: List<Tables>) -> Unit,
+    setNum: (Int) -> Unit,
+    vm: ReservationsViewModel = viewModel()
+) {
     Column(
         modifier = Modifier
             .height(80.dp)
@@ -212,6 +239,9 @@ fun DurationPicker(selected: Int, setNum: (Int) -> Unit) {
                     shape = RoundedCornerShape(50),
                     onClick = {
                         setNum(it)
+                        pickedTables?.let{
+                            vm.checkTimeAvailability(pickedHour,0,pickedDate, pickedTables, setTable)
+                        }
                     }
                 ) {
                     Text(
@@ -296,7 +326,7 @@ fun BookingTimePicker(
                     color = Color.Black.copy(alpha = 0.5f),
                     text = "No Available Hours"
                 )}
-            else items(items = (if(LocalTime.now().hour > 11) LocalTime.now().hour..20 else 11..20).toList(),
+            else items(items = (if(LocalTime.now().hour > 11 && pickedDate == LocalDate.now()) LocalTime.now().hour..20 else 11..20).toList(),
             ){
                 val list by lazy {
                     vm.checkTableAvailability(it, date = pickedDate)
@@ -306,7 +336,6 @@ fun BookingTimePicker(
                     list.forEach { table ->
                         sum += table.seats.toInt()
                     }
-                    Log.e("$$$$$$$$$$$", sum.toString())
                     sum
                 }
 
@@ -333,18 +362,13 @@ fun BookingTimePicker(
  * Updates values in parent function
  */
 @Composable
-fun BookingDatePicker(setDate: (LocalDate) -> Unit) {
+fun BookingDatePicker(pickedDate: LocalDate, setDate: (LocalDate) -> Unit) {
     val context = LocalContext.current
-    var pickedDate by remember {
-        mutableStateOf(
-            if (LocalDate.now().dayOfWeek < DayOfWeek.WEDNESDAY)
-                LocalDate.now().plusDays(DayOfWeek.WEDNESDAY.value.toLong() - LocalDate.now().dayOfWeek.value)
-            else
-                LocalDate.now()
-        )
+    var date by remember {
+        mutableStateOf(pickedDate)
     }
     val formattedDate by remember {
-        derivedStateOf { DateTimeFormatter.ofPattern("MMM dd yyyy").format(pickedDate) }
+        derivedStateOf { DateTimeFormatter.ofPattern("MMM dd yyyy").format(date) }
     }
     val dateDialogState = rememberMaterialDialogState()
     
@@ -397,8 +421,8 @@ fun BookingDatePicker(setDate: (LocalDate) -> Unit) {
                 it.isAfter(LocalDate.now().minusDays(1)) && it.dayOfWeek >= DayOfWeek.WEDNESDAY
             }
         ) {
-            pickedDate = it
             setDate(it)
+            date = it
         }
     }
 }
