@@ -1,5 +1,6 @@
 package com.example.rusticroots.pages
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,8 +14,8 @@ import androidx.compose.material.*
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -117,13 +118,14 @@ fun DetailsScreen(
     isItConfirmed: (confirmed: Boolean) -> Unit,
     vm: ReservationsViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     //vm.anonLogin()
     //vm.createBooking(1, LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(11, 0)), LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(15, 0)))
     //vm.createBooking(2, LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(11, 0)), LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(15, 0)))
     //vm.getAllBookings()
     if (vm._allTables.isEmpty()) vm.getAllTables()
 
-    var pickedDate by remember { mutableStateOf(LocalDate.now()) }
+    var pickedDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
     val setDate: (LocalDate) -> Unit = { pickedDate = it }
 
     var pickedHour by remember { mutableStateOf(0) }
@@ -132,31 +134,48 @@ fun DetailsScreen(
     var pickedTableList: List<Tables>? by remember { mutableStateOf(null) }
     val setTableList: (List<Tables>) -> Unit = { pickedTableList = it }
 
+    var maxGuests by remember { mutableStateOf(0) }
+    val setMaxGuest: (Int) -> Unit = { maxGuests = it }
+
     var guests by remember { mutableStateOf(0) }
     val setGuest: (Int) -> Unit = { guests = it }
 
-    var duration by remember { mutableStateOf(1) }
+    var duration by rememberSaveable { mutableStateOf(1) }
     val setDuration: (Int) -> Unit = { duration = it }
+
+    val bool: Boolean = (pickedTableList != null && pickedHour != 0 && guests != 0)
 
     Column{
         BookingDatePicker(setDate)
         Divider()
-        BookingTimePicker(setHour, setTableList, pickedDate, pickedHour)
+        BookingTimePicker(setHour, setTableList, pickedDate, pickedHour, setMaxGuest)
         Divider()
-        GuestPicker(guests, setGuest)
+        GuestPicker(maxGuests, guests, setGuest)
         Divider()
         DurationPicker(duration, setDuration)
         Divider()
-        TablePicker(pickedTableList)
-        Divider()
         Button(
+            colors =
+                if (!bool)
+                    ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)
+                else
+                    ButtonDefaults.buttonColors(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(32.dp),
             shape = RoundedCornerShape(50),
             onClick = {
-                isItConfirmed(true)
-                indexMe(1)
+                if (!bool) {
+                    Toast.makeText(
+                        context,
+                        "Please select all fields to proceed",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }else {
+                    isItConfirmed(true)
+                    indexMe(1)
+                }
+
             }
         ) {
             Text(fontWeight = FontWeight.Bold, text = "Continue")
@@ -206,15 +225,7 @@ fun DurationPicker(selected: Int, setNum: (Int) -> Unit) {
 }
 
 @Composable
-fun TablePicker(
-    tableList: List<Tables>?,
-    vm: ReservationsViewModel = viewModel()
-){
-
-}
-
-@Composable
-fun GuestPicker(selected: Int, setNum: (Int) -> Unit) {
+fun GuestPicker(maxGuests: Int, selected: Int, setNum: (Int) -> Unit) {
     Column(
         modifier = Modifier
             .height(80.dp)
@@ -231,6 +242,7 @@ fun GuestPicker(selected: Int, setNum: (Int) -> Unit) {
             items(items = (1..8).toList(),
             ){
                 Button(
+                    enabled = maxGuests >= it,
                     colors = if (it == selected) ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary) else ButtonDefaults.buttonColors(),
                     modifier = Modifier.padding(horizontal = 8.dp),
                     shape = RoundedCornerShape(50),
@@ -255,9 +267,12 @@ fun BookingTimePicker(
     pickedTableList: (List<Tables>) -> Unit,
     pickedDate: LocalDate,
     selected: Int,
+    maxGuests: (Int) -> Unit,
     vm: ReservationsViewModel = viewModel()
 ) {
-
+    var sum by remember {
+        mutableStateOf(0)
+    }
     Column(
         modifier = Modifier
             .height(88.dp)
@@ -283,7 +298,18 @@ fun BookingTimePicker(
                 )}
             else items(items = (if(LocalTime.now().hour > 11) LocalTime.now().hour..20 else 11..20).toList(),
             ){
-                val list = vm.checkTableAvailability(it, date = pickedDate)
+                val list by lazy {
+                    vm.checkTableAvailability(it, date = pickedDate)
+                }
+                val num by lazy {
+                    sum = 0
+                    list.forEach { table ->
+                        sum += table.seats.toInt()
+                    }
+                    Log.e("$$$$$$$$$$$", sum.toString())
+                    sum
+                }
+
                 Button(
                     colors = if (it == selected) ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary) else ButtonDefaults.buttonColors(),
                     modifier = Modifier.padding(horizontal = 8.dp),
@@ -292,6 +318,7 @@ fun BookingTimePicker(
                     onClick = {
                         pickedHour(it)
                         pickedTableList(list)
+                        maxGuests(num)
                     }
                 ) {
                     Text(fontWeight = FontWeight.Bold,text = "$it:00")
@@ -390,7 +417,7 @@ fun PageTop() {
                 painter = painterResource(id = R.drawable.ingredients),
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
-                modifier = Modifier.height(220.dp)
+                modifier = Modifier.height(160.dp)
             )
             // Cancel button + Table Reservation text
             Row(
@@ -421,6 +448,8 @@ fun PageTop() {
             }
             Divider(color = Color.Gray)
         }
+        //TODO if you want to add the logo back. Personally i think it looks better without
+        /*
         //Logo Container
         Box(
             modifier = Modifier
@@ -435,5 +464,7 @@ fun PageTop() {
                 modifier = Modifier.scale(1.4f)
             )
         }
+
+         */
     }
 }
