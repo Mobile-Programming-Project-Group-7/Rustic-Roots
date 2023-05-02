@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rusticroots.viewmodel.PaymentGViewModel
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
@@ -27,7 +28,7 @@ import org.json.JSONException
 import org.json.JSONObject
 
 @Composable
-fun GooglePayButton(paymentGVM: PaymentGViewModel) {
+fun GooglePayButton(paymentGVM: PaymentGViewModel = viewModel()) {
     val resolvePaymentForResult = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
             result: ActivityResult ->
         when (result.resultCode) {
