@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rusticroots.R
+import com.example.rusticroots.model.data.Booking
+import com.example.rusticroots.model.data.PassBookingData
 import com.example.rusticroots.model.data.Tables
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.ReservationsViewModel
@@ -66,9 +68,11 @@ fun BookingScreen() {
     var tabIndex by remember { mutableStateOf(0) }
     val indexMe: (Int) -> Unit = { tabIndex = it }
 
-    var table:List<Tables>? by remember { mutableStateOf(null) }
-    val setTable: (List<Tables>) -> Unit = { table = it }
-    table?.forEach {t-> Log.e("TABLE!!!!!!!!", t.toString())}
+    var booking: PassBookingData? by remember { mutableStateOf(null) }
+    val setBooking: (PassBookingData) -> Unit = { booking = it }
+    Log.e("BOOOKKING PASS DATA", booking?.table?.last()?.tableID.toString())
+    Log.e("BOOOKKING PASS DATA", booking?.table?.first()?.tableID.toString())
+
 
     val tabs = listOf("Details", "Summary")
     Column {
@@ -101,10 +105,14 @@ fun BookingScreen() {
         }
 
         when (tabIndex) {
-            0 -> DetailsScreen(setTable, indexMe, isItConfirmed)
-            1 -> SummaryScreen(/*TABLE, StartDateTime, EndDateTime*/)
+            0 -> DetailsScreen(setBooking, indexMe, isItConfirmed)
+            1 -> SummaryScreen(booking)
         }
     }
+}
+@Composable
+fun SummaryScreen(passedVal: PassBookingData?) {
+    Text(text = "title")
 }
 
 @Composable
@@ -119,7 +127,7 @@ fun ColumnTitle(title: String) {
 
 @Composable
 fun DetailsScreen(
-    setTable: (table: List<Tables>) -> Unit,
+    setBooking: (booking: PassBookingData) -> Unit,
     indexMe: (tabIndex: Int) -> Unit ,
     isItConfirmed: (confirmed: Boolean) -> Unit,
     vm: ReservationsViewModel = viewModel()
@@ -139,7 +147,6 @@ fun DetailsScreen(
                 LocalDate.now()
         )
     }
-    Log.e("PICKED DATE", pickedDate.toString())
     val setDate: (LocalDate) -> Unit = { pickedDate = it }
 
     var pickedHour by remember { mutableStateOf(0) }
@@ -156,6 +163,9 @@ fun DetailsScreen(
 
     var duration by rememberSaveable { mutableStateOf(1) }
     val setDuration: (Int) -> Unit = { duration = it }
+
+    var table: List<Tables>? by remember { mutableStateOf(null) }
+    val setTable: (List<Tables>) -> Unit = { table = it }
 
     val bool: Boolean = (pickedTableList != null && pickedHour != 0 && guests != 0)
 
@@ -193,7 +203,19 @@ fun DetailsScreen(
                 }else {
                     isItConfirmed(true)
                     indexMe(1)
-
+                    table?.let {
+                        setBooking(PassBookingData(
+                                table = it,
+                                guests = guests.toLong(),
+                                time_start = LocalDateTime.of(
+                                    pickedDate,
+                                    LocalTime.of(pickedHour, 0)),
+                                time_end = LocalDateTime.of(
+                                    pickedDate,
+                                    LocalTime.of(pickedHour, 0)
+                                ).plusHours(duration.toLong())
+                        ))
+                    }
                 }
 
             }
@@ -201,12 +223,6 @@ fun DetailsScreen(
             Text(fontWeight = FontWeight.Bold, text = "Continue")
         }
     }
-}
-
-
-@Composable
-fun SummaryScreen() {
-    Text(text = "title")
 }
 
 @Composable
@@ -332,7 +348,7 @@ fun BookingTimePicker(
                 )}
             else items(items = (times),
             ){
-                val list by lazy { vm.checkTableAvailability(it, date = pickedDate, endIn = duration)}
+                val list by lazy { vm.checkTableAvailability(it, date = pickedDate, endIn = duration.toLong())}
                 val num by lazy {
                     sum = 0
                     list.forEach { table ->
