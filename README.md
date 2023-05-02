@@ -11,7 +11,7 @@ The primary objective of this project is to create a restaurant table booking  m
 1.
 
 ## In-app technology
-This Android app is built by Kotlin, targetting min SDK 28 and following MVVM software architectural pattern. 
+This Android app is built by Kotlin, targetting SDK 33 , min SDK 28 and following MVVM software architectural pattern. 
 
 Components used in App: 
 * FrontEnd: jetpack compose, Bottom navigation, 
