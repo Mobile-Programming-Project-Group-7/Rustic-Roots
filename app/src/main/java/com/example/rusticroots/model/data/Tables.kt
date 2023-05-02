@@ -21,6 +21,7 @@ fun tableID(num: Int): String = "table_$num"
 data class Booking(
     val ref_tableID: String,
     val ref_userID: String,
+    val guests: Long,
     val time_start: Date,
     val time_end: Date,
     @get:Exclude val bookingID: String = "",
