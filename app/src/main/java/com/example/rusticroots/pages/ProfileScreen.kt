@@ -49,13 +49,7 @@ fun ProfileScreen() {
             .background(Color.Blue),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = "PROFILE",
-                fontSize = MaterialTheme.typography.h3.fontSize,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+       
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = launchLoginActivity) {
                 Text(
