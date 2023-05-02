@@ -15,7 +15,8 @@
         android:label=""
         android:supportsRtl="true"
         android:theme="@style/Theme.RusticRoots"
-        tools:targetApi="31">
+        android:enableOnBackInvokedCallback="true"
+        tools:targetApi="tiramisu">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -26,6 +27,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.example.rusticroots.view.LoginActivity"
+            android:theme="@style/Theme.AppCompat.Light" />
+        <activity
+            android:name="com.example.rusticroots.view.SignUpActivity"
+            android:theme="@style/Theme.AppCompat.Light" />
         <!-- This element is required in order to use the PaymentsClient -->
         <meta-data
             android:name="com.google.android.gms.wallet.api.enabled"

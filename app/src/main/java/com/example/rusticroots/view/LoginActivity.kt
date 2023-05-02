@@ -2,6 +2,7 @@ package com.example.rusticroots.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -15,23 +16,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-
+private lateinit var auth: FirebaseAuth
+//auth = Firebase.auth;
 class LoginActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Initialize Firebase Auth
-        auth = Firebase.auth
+
 
         setContent {
-
+            LoginComposable();
         }
     }
 }
@@ -39,17 +41,24 @@ class LoginActivity : AppCompatActivity() {
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun LoginComposable(navController: NavController) {
+fun LoginComposable() {
     val auth = Firebase.auth
-    LoginScreen(auth, navController)
+    LoginScreen(auth)
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun LoginScreen(auth: FirebaseAuth, navController: NavController) {
+fun LoginScreen(auth: FirebaseAuth) {
     val context = LocalContext.current
     var emailValue by remember { mutableStateOf(TextFieldValue()) }
     var passwordValue by remember { mutableStateOf(TextFieldValue()) }
+    val launchLoginActivity =
+        remember {
+            {
+                val intent = Intent(context, SignUpActivity::class.java)
+                context.startActivity(intent)
+            }
+        }
 
     Scaffold(
         topBar = {
@@ -82,16 +91,16 @@ fun LoginScreen(auth: FirebaseAuth, navController: NavController) {
                             emailValue.text,
                             passwordValue.text,
                             context,
-                            navController
-                        )
+
+                            )
                     }
                 ) {
                     Text("Login")
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
-                TextButton(onClick = {
-                    navController.navigate("register")
-                }) {
+
+                TextButton(onClick = launchLoginActivity)  {
                     Text("Don't have an account? Sign up")
                 }
             }
@@ -99,7 +108,7 @@ fun LoginScreen(auth: FirebaseAuth, navController: NavController) {
     )
 }
 
-fun signInUser(auth: FirebaseAuth, email: String, password: String, context: Context, navController: NavController) {
+fun signInUser(auth: FirebaseAuth, email: String, password: String, context: Context) {
     if (email.isEmpty() || password.isEmpty()) {
         showToast(context, "Please fill in all the details")
         return
@@ -107,7 +116,9 @@ fun signInUser(auth: FirebaseAuth, email: String, password: String, context: Con
     auth.signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                navController.navigate("destination_route") // Replace "destination_route" with the route you want to navigate to after login
+
+                // Replace     "destination_route" with the route you want to navigate to after login
+
             } else {
                 showToast(context, "Authentication failed")
                 Log.d("LoginActivity", task.exception?.message ?: "")
