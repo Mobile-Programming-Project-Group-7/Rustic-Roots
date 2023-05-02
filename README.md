@@ -45,7 +45,7 @@ Components used in App:
 
 ## Contributors:
 This project is developed by Group-7:
-- **Christina Vargka**, [Github account](https://github.com/ChrisVar95)
-- **Sujata Shrestha**, [Github account](https://github.com/sujata054)
-- **Esther Fatoyinbo**, [Github account](https://github.com/bebesf)
+- **Christina Vargka**, [Github account](https://github.com/ChrisVar95) ( Database + Table Booking Management Functionality +Payment gateway integration)
+- **Sujata Shrestha**, [Github account](https://github.com/sujata054)( Design + MainScreens Navigation +Routing)
+- **Esther Fatoyinbo**, [Github account](https://github.com/bebesf)( Database + User Authentication)
 
