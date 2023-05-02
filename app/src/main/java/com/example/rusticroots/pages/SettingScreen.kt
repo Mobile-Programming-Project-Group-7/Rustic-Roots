@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.rusticroots.ui.theme.RusticRootsTheme
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -19,9 +20,7 @@ fun SettingsScreen() {
     val (isDarkModeOn, setDarkModeOn) = remember { mutableStateOf(isSystemInDarkTheme) }
     val (areNotificationsOn, setNotificationsOn) = remember { mutableStateOf(true) }
 
-    MaterialTheme(
-        colors = if (isDarkModeOn) darkColors() else lightColors()
-    ) {
+    RusticRootsTheme(darkTheme = isDarkModeOn) {
         Scaffold(
             topBar = {
                 TopAppBar(
