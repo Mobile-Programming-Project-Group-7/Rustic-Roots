@@ -2,7 +2,7 @@
 The primary objective of this project is to create a restaurant table booking  mobile application.'
 
 ## Tables of contents
-*[Tools](#tools)
+* [Tools](#tools)
 * [App Features](#app-features)
 * [In-app technology](#in-app-technology)
 * [App Demo Video](#app-demo-video)
@@ -13,7 +13,7 @@ The primary objective of this project is to create a restaurant table booking  m
 -  UI design tool: [**Figma**](https://www.figma.com/)
 -  Code editor: [**Android Studio**](https://developer.android.com/studio/)
 -  Database design tool: [**Firebase**](https://console.firebase.google.com/u/0/)
--  
+-  Version control:  [**Git**](https://git-scm.com/) and [**Github**](https://github.com/)
 
 ## App Features
 1. Customers can order foods before booking the tables.
