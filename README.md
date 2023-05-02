@@ -8,12 +8,7 @@ The primary objective of this project is to create a restaurant table booking  m
 * [App UI](#app-ui)
 
 ## App Features
-1. Browse parties and members information. 
-1. View member's reviews and their star rating based on the listed reviews.
-1. Add, Update and Delete reviews for each members.
-1. Send emails to Parliament members.
-1. Add members to favorite list and view favorite list.
-1. View statistic of party in Finnish parliament.
+1.
 
 ## In-app technology
 This Android app is built by Kotlin, targetting min SDK 24 and following MVVM software architectural pattern. 
