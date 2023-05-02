@@ -9,11 +9,6 @@ sealed class BottomBarScreen(
     val title: String,
     val icon: ImageVector
 ) {
-    object MainScreen : BottomBarScreen(
-        route = "home",
-        title = "Home",
-        icon = Icons.Default.Home
-    )
     object CartScreen : BottomBarScreen(
         route = "Cart",
         title = "Cart",
@@ -24,6 +19,11 @@ sealed class BottomBarScreen(
         title = "Book",
         icon = Icons.Default.List)
 
+    object MainScreen : BottomBarScreen(
+        route = "home",
+        title = "Home",
+        icon = Icons.Default.Home
+    )
     object ProfileScreen : BottomBarScreen(
         route = "profile",
         title = "Profile",

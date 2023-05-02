@@ -44,18 +44,25 @@ fun ProfileScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
+            .background(Color.Blue),
         contentAlignment = Alignment.Center
     ) {
-       
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = launchLoginActivity) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Login",
-                fontSize = MaterialTheme.typography.h5.fontSize,
+                text = "PROFILE",
+                fontSize = MaterialTheme.typography.h3.fontSize,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colors.onPrimary
+                color = Color.White
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = launchLoginActivity) {
+                Text(
+                    text = "Login",
+                    fontSize = MaterialTheme.typography.h5.fontSize,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colors.onPrimary
+                )
+            }
         }
     }
 }
