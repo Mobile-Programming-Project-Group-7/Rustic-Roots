@@ -22,9 +22,14 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.rusticroots.R
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.rusticroots.model.data.Route
 import com.example.rusticroots.ui.theme.RusticRootsTheme
-
 
 
 @Composable
@@ -118,6 +123,7 @@ fun Content(){
 }
 @Composable
 fun Header() {
+    val navController = rememberNavController()
         Card(
             Modifier
                 .height(60.dp)
@@ -149,25 +155,31 @@ fun Header() {
                 }
 
                 VerticalDivider()
-                Row(Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .clickable { }
-                    .padding(horizontal=8.dp),
-                    verticalAlignment=Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter=painterResource(id=R.drawable.ic_money),
-                        contentDescription="", tint = MaterialTheme.colors.primary)
-                    Column(Modifier.padding(8.dp)) {
-                        Text(text="Book Now", color=Color.Black, fontSize=18.sp)
-                    }
-                }
-            }
+                val navController= rememberNavController()
+
+                Row(
+                    Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .clickable {
+
+                        }
+                        .padding(horizontal=8.dp),
+                            verticalAlignment=Alignment.CenterVertically
+                            ) {
+                            Icon(
+                                painter=painterResource(id=R.drawable.ic_money),
+                                contentDescription="", tint=MaterialTheme.colors.primary
+                            )
+                            Column(Modifier.padding(8.dp)) {
+                                Text(text="Book Now", color=Color.Black, fontSize=18.sp)
+                            }
+                        }
+                        }
         }
     }
 
-    @Composable
+@Composable
     fun QrButton() {
         IconButton(
             onClick={},

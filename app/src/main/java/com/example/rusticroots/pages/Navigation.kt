@@ -26,9 +26,9 @@ fun Navigation() {
 @Composable
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
+        BottomBarScreen.MainScreen,
         BottomBarScreen.CartScreen,
         BottomBarScreen.BookingScreen,
-        BottomBarScreen.MainScreen,
         BottomBarScreen.ProfileScreen,
         BottomBarScreen.SettingScreen,
     )
