@@ -20,9 +20,9 @@ Components used in App:
 * FrontEnd: jetpack compose, Bottom navigation, 
 * BackEnd:
 1. Database: firebase
-1. Network: Retrofit
+1. Network:
 1. WorkManager: Update data from network periodically once a day in background 
-1. Unit Testing: JUnit 4 (for app main functions)
+1. Unit Testing:
 1. 
 
 
