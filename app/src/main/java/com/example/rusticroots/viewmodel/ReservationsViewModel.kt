@@ -187,7 +187,7 @@ class ReservationsViewModel: ViewModel() {
                          u.add(table[0])
                     }
                     // If the table is still busy at TIMEEND, add table
-                    if (it.time_start < timeEnd.toDate()){
+                    if (it.time_start < timeEnd.toDate() && it.time_start >= time.toDate()   ){
                         u.add(table[0])
                     }
                 }
@@ -246,11 +246,11 @@ class ReservationsViewModel: ViewModel() {
     /**
      * Creates a booking
      */
-    fun createBooking(tableID: Int, guests: Long, timeStart: LocalDateTime, timeEnd: LocalDateTime) {
+    fun createBooking(tableID: String, guests: Long, timeStart: LocalDateTime, timeEnd: LocalDateTime) {
         viewModelScope.launch {
             user.value?.let {
                 val booking =
-                    Booking(tableID(tableID), it.uid, guests,  timeStart.toDate(), timeEnd.toDate())
+                    Booking(tableID, it.uid, guests,  timeStart.toDate(), timeEnd.toDate())
                 db.collection(COLLECTION_BOOKINGS)
                     .add(booking)
                     .addOnSuccessListener {
