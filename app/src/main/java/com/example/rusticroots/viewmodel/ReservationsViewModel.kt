@@ -100,9 +100,10 @@ class ReservationsViewModel: ViewModel() {
                     it.documents.forEach { doc ->
                         val tId = doc.get("ref_tableID") as String
                         val uId = doc.get("ref_userID") as String
+                        val g = doc.get("guests") as Long
                         val start = doc.get("time_start") as Timestamp
                         val end = doc.get("time_end") as Timestamp
-                        docs.add(Booking(tId, uId, start.toDate(), end.toDate(), doc.id))
+                        docs.add(Booking(tId, uId, g, start.toDate(), end.toDate(), doc.id))
                     }
                     allValidBookings.clear()
                     allValidBookings.addAll(docs)
@@ -128,9 +129,10 @@ class ReservationsViewModel: ViewModel() {
                         it.documents.forEach { doc ->
                             val tId = doc.get("ref_tableID") as String
                             val uId = doc.get("ref_userID") as String
+                            val g = doc.get("guests") as Long
                             val start = doc.get("time_start") as Timestamp
                             val end = doc.get("time_end") as Timestamp
-                            docs.add(Booking(tId, uId, start.toDate(), end.toDate(), doc.id))
+                            docs.add(Booking(tId, uId, g, start.toDate(), end.toDate(), doc.id))
                         }
                         _userBookings.clear()
                         _userBookings.addAll(docs)
@@ -154,45 +156,42 @@ class ReservationsViewModel: ViewModel() {
         daysBookings.addAll(book)
     }
 
-    fun checkTimeAvailability(
-        hour: Int,
-        minute: Int = 0,
-        date: LocalDate = LocalDate.now(),
-        tables: List<Tables>,
-        setTableList: (table: List<Tables>) -> Unit
-    ) {
-        val time = LocalDateTime.of(date, LocalTime.of(hour, minute))
-        val t = mutableStateListOf<Tables>()
-        if (daysBookings.isEmpty()) t.addAll(tables)
-        daysBookings.forEach{
-            val table = tables.filter { table -> it.ref_tableID == table.tableID }
-            if (it.time_start.toLocalDateTime() >= time) {
-                t.add(table[0])
-            }
-        }
-        setTableList(t)
-    }
-
     /**
      * Checks available tables by the hour and returns a list of them
      */
     fun checkTableAvailability(
         hour: Int,
         minute: Int = 0,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate,
+        endIn: Long,
     ): List<Tables> {
-        getDayBookings(date)
         val time = LocalDateTime.of(date, LocalTime.of(hour, minute))
         val minTime = time.plusMinutes(30)
+        val timeEnd = time.plusHours(endIn)
         // The returned values
-        val t = mutableStateListOf<Tables>()
-        if (daysBookings.isEmpty()) return allTables
-        daysBookings.forEach {
-            val table = allTables.filter { table -> it.ref_tableID == table.tableID }
-            if (it.time_start < minTime.toDate() && time.toDate() < it.time_end) {
-                table[0].available = false
-            } else {
-                t.add(table[0])
+        var t = mutableStateListOf<Tables>()
+        val u = mutableStateListOf<Tables>() // used tables
+        viewModelScope.launch {
+            getDayBookings(date)
+            if (daysBookings.isEmpty()) t.addAll(allTables)
+            // WITHIN EACH BOOKING
+            // IF THE CORRECT BOOKING IS CHOSEN
+            // ADD ALL TABLES EXCEPT THAT ONE
+            else{
+                t.addAll(allTables)
+                daysBookings.forEach {
+                    //The table that's in the booking
+                    val table = allTables.filter { table -> it.ref_tableID == table.tableID }
+                    // If the time is between these times, the table is BUSY at TIMESTART
+                    if (it.time_start < minTime.toDate() && time.toDate() < it.time_end) {
+                         u.add(table[0])
+                    }
+                    // If the table is still busy at TIMEEND, add table
+                    if (it.time_start < timeEnd.toDate()){
+                        u.add(table[0])
+                    }
+                }
+                u.distinct().forEach{t.remove(it)}
             }
         }
         return t
@@ -247,11 +246,11 @@ class ReservationsViewModel: ViewModel() {
     /**
      * Creates a booking
      */
-    fun createBooking(tableID: Int, timeStart: LocalDateTime, timeEnd: LocalDateTime) {
+    fun createBooking(tableID: Int, guests: Long, timeStart: LocalDateTime, timeEnd: LocalDateTime) {
         viewModelScope.launch {
             user.value?.let {
                 val booking =
-                    Booking(tableID(tableID), it.uid, timeStart.toDate(), timeEnd.toDate())
+                    Booking(tableID(tableID), it.uid, guests,  timeStart.toDate(), timeEnd.toDate())
                 db.collection(COLLECTION_BOOKINGS)
                     .add(booking)
                     .addOnSuccessListener {

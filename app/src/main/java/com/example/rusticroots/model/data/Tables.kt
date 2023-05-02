@@ -1,7 +1,9 @@
 package com.example.rusticroots.model.data
 
 import com.google.firebase.firestore.Exclude
+import java.time.LocalDateTime
 import java.util.*
+import kotlin.collections.List
 
 
 /**
@@ -18,9 +20,17 @@ data class Tables(
 
 fun tableID(num: Int): String = "table_$num"
 
+data class PassBookingData(
+    val table: List<Tables>,
+    val guests: Long,
+    val time_start: LocalDateTime,
+    val time_end: LocalDateTime,
+)
+
 data class Booking(
     val ref_tableID: String,
     val ref_userID: String,
+    val guests: Long,
     val time_start: Date,
     val time_end: Date,
     @get:Exclude val bookingID: String = "",

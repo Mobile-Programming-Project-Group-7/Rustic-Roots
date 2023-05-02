@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rusticroots.R
+import com.example.rusticroots.model.data.Booking
+import com.example.rusticroots.model.data.PassBookingData
 import com.example.rusticroots.model.data.Tables
 import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.ReservationsViewModel
@@ -37,6 +39,7 @@ import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -58,7 +61,6 @@ fun BookingPreview() {
 
 @Composable
 fun BookingScreen() {
-    //vm.createBooking(2, LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(11, 0)), LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(15, 0)))
 
     var confirmed by remember { mutableStateOf(false) }
     val isItConfirmed: (Boolean) -> Unit = { confirmed = it}
@@ -66,9 +68,11 @@ fun BookingScreen() {
     var tabIndex by remember { mutableStateOf(0) }
     val indexMe: (Int) -> Unit = { tabIndex = it }
 
-    var table:List<Tables>? by remember { mutableStateOf(null) }
-    val setTable: (List<Tables>) -> Unit = { table = it }
-    table?.forEach {t-> Log.e("TABLE!!!!!!!!", t.toString())}
+    var booking: PassBookingData? by remember { mutableStateOf(null) }
+    val setBooking: (PassBookingData) -> Unit = { booking = it }
+    Log.e("BOOOKKING PASS DATA", booking?.table?.last()?.tableID.toString())
+    Log.e("BOOOKKING PASS DATA", booking?.table?.first()?.tableID.toString())
+
 
     val tabs = listOf("Details", "Summary")
     Column {
@@ -101,10 +105,14 @@ fun BookingScreen() {
         }
 
         when (tabIndex) {
-            0 -> DetailsScreen(setTable, indexMe, isItConfirmed)
-            1 -> SummaryScreen(/*TABLE, StartDateTime, EndDateTime*/)
+            0 -> DetailsScreen(setBooking, indexMe, isItConfirmed)
+            1 -> SummaryScreen(booking)
         }
     }
+}
+@Composable
+fun SummaryScreen(passedVal: PassBookingData?) {
+    Text(text = "title")
 }
 
 @Composable
@@ -119,16 +127,16 @@ fun ColumnTitle(title: String) {
 
 @Composable
 fun DetailsScreen(
-    setTable: (table: List<Tables>) -> Unit,
+    setBooking: (booking: PassBookingData) -> Unit,
     indexMe: (tabIndex: Int) -> Unit ,
     isItConfirmed: (confirmed: Boolean) -> Unit,
     vm: ReservationsViewModel = viewModel()
 ) {
+    //vm.createBooking(1, 6, LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(11, 0)), LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(15, 0)))
+    vm.getAllBookings()
+
     val context = LocalContext.current
-    lazy {
-        Log.e("!!GOT BOOKINGS!!", "")
-        vm.getAllBookings()
-    }
+
     if (vm.allTables.isEmpty()) vm.getAllTables()
 
     var pickedDate by rememberSaveable {
@@ -156,6 +164,9 @@ fun DetailsScreen(
     var duration by rememberSaveable { mutableStateOf(1) }
     val setDuration: (Int) -> Unit = { duration = it }
 
+    var table: List<Tables>? by remember { mutableStateOf(null) }
+    val setTable: (List<Tables>) -> Unit = { table = it }
+
     val bool: Boolean = (pickedTableList != null && pickedHour != 0 && guests != 0)
 
     if(guests != 0) {
@@ -166,11 +177,11 @@ fun DetailsScreen(
     Column{
         BookingDatePicker(pickedDate, setDate)
         Divider()
-        BookingTimePicker(setHour, setTableList, pickedDate, pickedHour, setMaxGuest)
+        BookingTimePicker(setHour, setTableList, pickedDate, pickedHour, setMaxGuest, duration)
+        Divider()
+        DurationPicker(duration, setDuration, setGuest)
         Divider()
         GuestPicker(maxGuests, guests, setGuest)
-        Divider()
-        DurationPicker( pickedHour, pickedDate, pickedTableList, duration, setTableList, setDuration)
         Divider()
         Button(
             colors =
@@ -192,7 +203,19 @@ fun DetailsScreen(
                 }else {
                     isItConfirmed(true)
                     indexMe(1)
-
+                    table?.let {
+                        setBooking(PassBookingData(
+                                table = it,
+                                guests = guests.toLong(),
+                                time_start = LocalDateTime.of(
+                                    pickedDate,
+                                    LocalTime.of(pickedHour, 0)),
+                                time_end = LocalDateTime.of(
+                                    pickedDate,
+                                    LocalTime.of(pickedHour, 0)
+                                ).plusHours(duration.toLong())
+                        ))
+                    }
                 }
 
             }
@@ -202,20 +225,11 @@ fun DetailsScreen(
     }
 }
 
-
-@Composable
-fun SummaryScreen() {
-    Text(text = "title")
-}
-
 @Composable
 fun DurationPicker(
-    pickedHour: Int,
-    pickedDate: LocalDate,
-    pickedTables: List<Tables>?,
     selected: Int,
-    setTable: (table: List<Tables>) -> Unit,
     setNum: (Int) -> Unit,
+    setGuest: (Int) -> Unit,
     vm: ReservationsViewModel = viewModel()
 ) {
     Column(
@@ -238,10 +252,8 @@ fun DurationPicker(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     shape = RoundedCornerShape(50),
                     onClick = {
+                        setGuest(0)
                         setNum(it)
-                        pickedTables?.let{
-                            vm.checkTimeAvailability(pickedHour,0,pickedDate, pickedTables, setTable)
-                        }
                     }
                 ) {
                     Text(
@@ -298,11 +310,19 @@ fun BookingTimePicker(
     pickedDate: LocalDate,
     selected: Int,
     maxGuests: (Int) -> Unit,
+    duration: Int,
     vm: ReservationsViewModel = viewModel()
 ) {
     var sum by remember {
         mutableStateOf(0)
     }
+    val times = (
+            if(LocalTime.now().hour > 11 && pickedDate == LocalDate.now())
+                LocalTime.now().hour..20
+            else
+                11..20
+    ).toList()
+
     Column(
         modifier = Modifier
             .height(88.dp)
@@ -326,11 +346,9 @@ fun BookingTimePicker(
                     color = Color.Black.copy(alpha = 0.5f),
                     text = "No Available Hours"
                 )}
-            else items(items = (if(LocalTime.now().hour > 11 && pickedDate == LocalDate.now()) LocalTime.now().hour..20 else 11..20).toList(),
+            else items(items = (times),
             ){
-                val list by lazy {
-                    vm.checkTableAvailability(it, date = pickedDate)
-                }
+                val list by lazy { vm.checkTableAvailability(it, date = pickedDate, endIn = duration.toLong())}
                 val num by lazy {
                     sum = 0
                     list.forEach { table ->
@@ -348,10 +366,12 @@ fun BookingTimePicker(
                         pickedHour(it)
                         pickedTableList(list)
                         maxGuests(num)
+                        list.forEach{t->Log.e("LIST OF TABLES TIME PICKER", t.toString())}
                     }
                 ) {
                     Text(fontWeight = FontWeight.Bold,text = "$it:00")
                 }
+
             }
         }
     }

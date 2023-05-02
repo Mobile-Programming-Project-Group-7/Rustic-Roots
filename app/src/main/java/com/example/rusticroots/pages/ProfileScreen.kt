@@ -1,7 +1,5 @@
 package com.example.rusticroots.pages
 
-
-
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -57,3 +55,4 @@ fun ProfileScreen() {
         }
     }
 }
+
