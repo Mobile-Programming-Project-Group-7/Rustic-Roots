@@ -1,7 +1,5 @@
 package com.example.rusticroots.pages
 
-
-
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,15 +48,15 @@ fun ProfileScreen() {
         contentAlignment = Alignment.Center
     ) {
        
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = launchLoginActivity) {
-                Text(
-                    text = "Login",
-                    fontSize = MaterialTheme.typography.h5.fontSize,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colors.onPrimary
-                )
-            }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = launchLoginActivity) {
+            Text(
+                text = "Login",
+                fontSize = MaterialTheme.typography.h5.fontSize,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colors.onPrimary
+            )
         }
     }
 }
+
