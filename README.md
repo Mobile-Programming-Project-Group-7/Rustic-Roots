@@ -4,7 +4,8 @@ The primary objective of this project is to create a restaurant table booking ap
 ## Tables of contents
 * [Tools](#tools)
 * [App Features](#app-features)
-* [In-app technology](#in-app-technology)
+* [Technologies Used](#technologies-used)
+* [Getting Started](#getting-started)
 * [App Demo Video](#app-demo-video)
 * [App UI](#app-ui)
 * [Contributors](#contributors)
@@ -31,33 +32,38 @@ The app features a booking system that allows users to reserve tables for a spec
 * ### Payment Integration:
 The app is integrated with popular payment systems such as Googlepay to ensure a seamless and secure payment experience for customers. This feature allows customers to pay for their meals easily and efficiently without having to worry about carrying cash or credit cards.
 
-## In-app technology
+## Technologies Used
 This Android app is built by Kotlin, targetting SDK 33 , min SDK 28 and following  Firebase, Jetpack Compose, MVVM software architectural pattern. 
 
 ### Components used in App: 
-#### FrontEnd
-* ##### Jetpack Compose:
+### FrontEnd
+* #### Jetpack Compose:
 Jetpack Compose is an Android UI toolkit that makes it easier and faster to build native Android apps. It is based on the idea of writing code in a declarative way, where you describe how the user interface should look and behave. With Jetpack Compose, you can create responsive and dynamic UIs with less code and in a more intuitive way.
 
-* ##### Bottom Navigation:
+* #### Bottom Navigation:
 Bottom Navigation is a UI pattern used in mobile apps to provide easy navigation between different sections of the app. It typically consists of a row of icons or labels at the bottom of the screen, and tapping on one of them takes you to the corresponding section. It is a commonly used design pattern in Android apps, and can help users quickly navigate between different parts of the app.
 
-#### BackEnd
-* ##### Database:
+### BackEnd
+* #### Database: Firebase
 Firebase is a cloud-based platform provided by Google that offers various services for building and running mobile and web apps. Firebase offers a real-time database that is a cloud-hosted NoSQL database that stores data in JSON format. It allows you to store and sync data in real-time across all connected clients, including web and mobile apps.
 
-* ##### Network:
+* #### Network: Retrofit
 The network component of the app is responsible for communicating with the server to fetch and send data. This can include making HTTP requests, parsing responses, and handling errors. In the app, this might be achieved using libraries such as Retrofit or Volley.
 
-* ##### WorkManager:
+* #### WorkManager:
 WorkManager is a library that allows you to schedule background tasks in your app, such as fetching data from the network or performing periodic updates. It is part of the Android Jetpack library, and offers a simple and efficient way to schedule work that needs to be done even when the app is not in the foreground.
 
-* ##### Unit Testing: 
+* #### Unit Testing: JUnit 4
 Unit testing is a software testing method in which individual units or components of a software application are tested in isolation. In the context of the app, this might include testing individual functions or classes to ensure that they are working correctly. Unit tests can help catch bugs early in the development process, and ensure that the app is functioning as expected. There are many testing frameworks available for Android development, including JUnit and Espresso.
 
-
+## Getting Started
+To run the app, you will need to clone the repository and configure Firebase in your project.
+* ### Clone the repo:
+git clone https://github.com/Mobile-Programming-Project-Group-7/Rustic-Roots.git
+* ### Set up Firebase:
+Follow the [**Firebase**](https://console.firebase.google.com/u/0/) documentation to create a new Firebase project and add the necessary Firebase services to your app.
+* ### Build and run the app in Android Studio.
 ## App Demo Video: 
-
 ## App UI:
 <img width="151" alt="1" src="https://user-images.githubusercontent.com/90723058/235725824-e508a6f7-6786-4cd6-82cc-b8a907540a79.png"><img width="142" alt="2" src="https://user-images.githubusercontent.com/90723058/235725853-238cb802-9eb8-4cbd-bd82-8d59875eba55.png"><img width="140" alt="3" src="https://user-images.githubusercontent.com/90723058/235725870-62a8dedf-65b4-4ab1-874c-96994a2c7b73.png"><img width="134" alt="4" src="https://user-images.githubusercontent.com/90723058/235725897-371ebdfe-85f0-483a-9d38-6b7485d55748.png"><img width="134" alt="5" src="https://user-images.githubusercontent.com/90723058/235725967-ef016adc-9f5b-4586-bdaa-ed3267f573fb.png"><img width="134" alt="6" src="https://user-images.githubusercontent.com/90723058/235779410-0d9db301-f3e6-4f7b-b834-d5b7f4fc66da.png"><img width="138" alt="7" src="https://user-images.githubusercontent.com/90723058/235725990-1f312a8a-f574-4719-b62f-f216966440f3.png">
 
@@ -68,8 +74,10 @@ Unit testing is a software testing method in which individual units or component
 
 
 ## Contributors:
-This project is developed by Group-7:
+This project is developed by :
 - **Christina Vargka**, [Github account](https://github.com/ChrisVar95) ( Database + Table Booking Management Functionality +Payment gateway integration)
 - **Sujata Shrestha**, [Github account](https://github.com/sujata054)( Design + MainScreens Navigation +Routing)
 - **Esther Fatoyinbo**, [Github account](https://github.com/bebesf)( Database + User Authentication)
 
+If you would like to contribute to the project, please submit a pull request with your changes.
+We welcome contributions from everyone!
