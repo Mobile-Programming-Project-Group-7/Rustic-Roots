@@ -1,5 +1,5 @@
 # Rustic-Roots App
-The primary objective of this project is to create a restaurant table booking  mobile application.'
+The primary objective of this project is to create a restaurant table booking application along with pre ordering the foods.
 
 ## Tables of contents
 * [Tools](#tools)
