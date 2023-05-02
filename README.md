@@ -30,4 +30,4 @@ Components used in App:
 
 ## App UI:
 
-##Contributors:
+## Contributors:
