@@ -87,12 +87,13 @@ fun BookingScreen(vm: ReservationsViewModel = viewModel()) {
 
         when (tabIndex) {
             0 -> DetailsScreen(setBooking, indexMe, isItConfirmed)
-            1 -> SummaryScreen(booking)
+            1 -> SummaryScreen(booking, indexMe)
         }
     }
 }
 @Composable
-fun SummaryScreen(passedVal: PassBookingData?, vm: ReservationsViewModel = viewModel()) {
+fun SummaryScreen(passedVal: PassBookingData?, indexMe: (tabIndex: Int) -> Unit , vm: ReservationsViewModel = viewModel()) {
+    val context = LocalContext.current
     val timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
     val formattedDate by remember {
         derivedStateOf { DateTimeFormatter.ofPattern("MMM dd yyyy").format(passedVal?.time_start?.toLocalDate()) }
@@ -130,7 +131,6 @@ fun SummaryScreen(passedVal: PassBookingData?, vm: ReservationsViewModel = viewM
             .padding(12.dp)
             .verticalScroll(rememberScrollState())
         ) {
-
             CustomCard("Date", formattedDate)
             CustomCard(title = "Guests", value = guests)
             CustomCard(title = "Time", value = formattedTime)
@@ -175,6 +175,12 @@ fun SummaryScreen(passedVal: PassBookingData?, vm: ReservationsViewModel = viewM
                             passedVal.time_end
                         )
                     }
+                    Toast.makeText(
+                        context,
+                        "Booking Created!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    indexMe(0)
                 }
             ) {
                 Text(fontWeight = FontWeight.Bold, text = "Confirm Booking")
