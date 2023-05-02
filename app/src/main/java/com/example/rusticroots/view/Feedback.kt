@@ -15,7 +15,7 @@ import androidx.navigation.NavController
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun FeedbackScreen(onSubmit: (String) -> Unit, navController: NavController) {
+fun Feedback(onSubmit: (String) -> Unit, navController: NavController) {
     var feedbackText by remember { mutableStateOf(TextFieldValue()) }
 
     Scaffold(
