@@ -1,7 +1,5 @@
 package com.example.rusticroots.view
 
-
-
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -9,25 +7,17 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-<<<<<<< HEAD
 import androidx.compose.foundation.Image
-=======
->>>>>>> origin/main
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-<<<<<<< HEAD
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.rusticroots.R
-=======
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
->>>>>>> origin/main
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -69,15 +59,12 @@ class SignUpActivity : AppCompatActivity() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-<<<<<<< HEAD
                     Image(
                         painter = painterResource(id = R.drawable.rustic_roots),
                         contentDescription = "Rustic Roots logo",
                         modifier = Modifier.size(200.dp)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-=======
->>>>>>> origin/main
                     OutlinedTextField(
                         value = emailValue,
                         onValueChange = { emailValue = it },
