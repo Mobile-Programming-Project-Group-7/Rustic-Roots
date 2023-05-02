@@ -2,9 +2,7 @@ package com.example.rusticroots.pages
 
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -24,15 +22,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rusticroots.R
-import com.example.rusticroots.model.data.Booking
 import com.example.rusticroots.model.data.PassBookingData
 import com.example.rusticroots.model.data.Tables
-import com.example.rusticroots.ui.theme.RusticRootsTheme
 import com.example.rusticroots.viewmodel.ReservationsViewModel
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -42,25 +38,13 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
-
-@Preview(showBackground = true)
-@Composable
-fun BookingPreview() {
-    RusticRootsTheme {
-        Surface(modifier = Modifier
-            .fillMaxWidth()
-            //.height(80.dp)
-            ,
-            color = MaterialTheme.colors.background) {
-            //DurationPicker(1){}
-            BookingScreen()
-        }
-    }
-}
 
 @Composable
-fun BookingScreen() {
+fun BookingScreen(vm: ReservationsViewModel = viewModel()) {
+    vm.getAllBookings()
+    if (vm.allTables.isEmpty()) vm.getAllTables()
 
     var confirmed by remember { mutableStateOf(false) }
     val isItConfirmed: (Boolean) -> Unit = { confirmed = it}
@@ -70,9 +54,6 @@ fun BookingScreen() {
 
     var booking: PassBookingData? by remember { mutableStateOf(null) }
     val setBooking: (PassBookingData) -> Unit = { booking = it }
-    Log.e("BOOOKKING PASS DATA", booking?.table?.last()?.tableID.toString())
-    Log.e("BOOOKKING PASS DATA", booking?.table?.first()?.tableID.toString())
-
 
     val tabs = listOf("Details", "Summary")
     Column {
@@ -106,13 +87,132 @@ fun BookingScreen() {
 
         when (tabIndex) {
             0 -> DetailsScreen(setBooking, indexMe, isItConfirmed)
-            1 -> SummaryScreen(booking)
+            1 -> SummaryScreen(booking, indexMe)
         }
     }
 }
 @Composable
-fun SummaryScreen(passedVal: PassBookingData?) {
-    Text(text = "title")
+fun SummaryScreen(passedVal: PassBookingData?, indexMe: (tabIndex: Int) -> Unit , vm: ReservationsViewModel = viewModel()) {
+    val context = LocalContext.current
+    val timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
+    val formattedDate by remember {
+        derivedStateOf { DateTimeFormatter.ofPattern("MMM dd yyyy").format(passedVal?.time_start?.toLocalDate()) }
+    }
+
+    val guests = passedVal?.guests.toString()
+
+    val timeStart = passedVal?.time_start?.toLocalTime()?.format(timeFormat)
+    val timeEnd = passedVal?.time_end?.toLocalTime()?.format(timeFormat)
+    val formattedTime = "$timeStart - $timeEnd"
+
+    val tables = mutableListOf<String>()
+    passedVal?.table?.forEach { tables.add(it.tableID) }
+    val formattedTables = tables.toString().replace("[", "").replace("table_","").replace("]","")
+
+    Column {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(bottomStart = 72.dp, bottomEnd = 72.dp))
+                .background(MaterialTheme.colors.primary)
+                .fillMaxWidth()
+                .height(72.dp)
+            ,horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+
+                color = MaterialTheme.colors.onPrimary,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center, text = "Summary"
+            )
+        }
+        Column(modifier = Modifier
+            .padding(12.dp)
+            .verticalScroll(rememberScrollState())
+        ) {
+            CustomCard("Date", formattedDate)
+            CustomCard(title = "Guests", value = guests)
+            CustomCard(title = "Time", value = formattedTime)
+            Card(
+                modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxWidth()
+                ,elevation = 4.dp,
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ColumnTitle(title = "Table No.")
+                        Text(
+                            text = formattedTables,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                        )
+                    }
+                    passedVal?.table?.forEach {
+                        CustomCard(
+                            title = "Table ${it.tableID.replace("table_", "")}",
+                            value = it.description
+                        )
+                    }
+                }
+            }
+            Button(
+                modifier = Modifier.fillMaxWidth().padding(32.dp),
+                shape = RoundedCornerShape(50),
+                onClick = {
+                    passedVal?.table?.forEach {
+                        vm.createBooking(
+                            it.tableID,
+                            passedVal.guests,
+                            passedVal.time_start,
+                            passedVal.time_end
+                        )
+                    }
+                    Toast.makeText(
+                        context,
+                        "Booking Created!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    indexMe(0)
+                }
+            ) {
+                Text(fontWeight = FontWeight.Bold, text = "Confirm Booking")
+            }
+            Divider(modifier = Modifier.padding(vertical = 40.dp))
+        }
+    }
+}
+
+@Composable
+fun CustomCard(title: String, value: String ) {
+    Card(
+        modifier = Modifier
+            .padding(12.dp)
+            .fillMaxWidth()
+        ,elevation = 4.dp,
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            ColumnTitle(title = title)
+            Text(
+                textAlign = TextAlign.End,
+                text = value,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+            )
+        }
+    }
 }
 
 @Composable
@@ -132,12 +232,7 @@ fun DetailsScreen(
     isItConfirmed: (confirmed: Boolean) -> Unit,
     vm: ReservationsViewModel = viewModel()
 ) {
-    //vm.createBooking(1, 6, LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(11, 0)), LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(15, 0)))
-    vm.getAllBookings()
-
     val context = LocalContext.current
-
-    if (vm.allTables.isEmpty()) vm.getAllTables()
 
     var pickedDate by rememberSaveable {
         mutableStateOf(
@@ -229,8 +324,7 @@ fun DetailsScreen(
 fun DurationPicker(
     selected: Int,
     setNum: (Int) -> Unit,
-    setGuest: (Int) -> Unit,
-    vm: ReservationsViewModel = viewModel()
+    setGuest: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -252,7 +346,7 @@ fun DurationPicker(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     shape = RoundedCornerShape(50),
                     onClick = {
-                        setGuest(0)
+                        setGuest(0) // Prevents app from crashing :)
                         setNum(it)
                     }
                 ) {
