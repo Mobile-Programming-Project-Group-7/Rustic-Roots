@@ -59,7 +59,9 @@ Unit testing is a software testing method in which individual units or component
 ## Getting Started
 To run the app, you will need to clone the repository and configure Firebase in your project.
 * ### Clone the repo:
+```
 git clone https://github.com/Mobile-Programming-Project-Group-7/Rustic-Roots.git
+```
 * ### Set up Firebase:
 Follow the [**Firebase**](https://console.firebase.google.com/u/0/) documentation to create a new Firebase project and add the necessary Firebase services to your app.
 * ### Build and run the app in Android Studio.
