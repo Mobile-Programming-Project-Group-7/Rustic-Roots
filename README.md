@@ -65,15 +65,9 @@ git clone https://github.com/Mobile-Programming-Project-Group-7/Rustic-Roots.git
 * ### Set up Firebase:
 Follow the [**Firebase**](https://console.firebase.google.com/u/0/) documentation to create a new Firebase project and add the necessary Firebase services to your app.
 * ### Build and run the app in Android Studio.
-## App Demo Video: 
+
 ## App UI:
 <img width="151" alt="1" src="https://user-images.githubusercontent.com/90723058/235725824-e508a6f7-6786-4cd6-82cc-b8a907540a79.png"><img width="142" alt="2" src="https://user-images.githubusercontent.com/90723058/235725853-238cb802-9eb8-4cbd-bd82-8d59875eba55.png"><img width="140" alt="3" src="https://user-images.githubusercontent.com/90723058/235725870-62a8dedf-65b4-4ab1-874c-96994a2c7b73.png"><img width="134" alt="4" src="https://user-images.githubusercontent.com/90723058/235725897-371ebdfe-85f0-483a-9d38-6b7485d55748.png"><img width="134" alt="5" src="https://user-images.githubusercontent.com/90723058/235725967-ef016adc-9f5b-4586-bdaa-ed3267f573fb.png"><img width="134" alt="6" src="https://user-images.githubusercontent.com/90723058/235779410-0d9db301-f3e6-4f7b-b834-d5b7f4fc66da.png"><img width="138" alt="7" src="https://user-images.githubusercontent.com/90723058/235725990-1f312a8a-f574-4719-b62f-f216966440f3.png">
-
-
-
-
-
-
 
 ## Contributors:
 This project is developed by :
